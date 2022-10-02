@@ -4,59 +4,80 @@ const Role = models.role;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+
+
+const checkAuth = (req, res, err, user) => {
+  if (err) {
+    res.status(500).send({ message: err });
+    return;
+  }
+
+  if (!user) {
+    return res.status(404).send({ message: "User Not found." });
+  }
+
+  var passwordIsValid = bcrypt.compareSync(
+    req.body.password,
+    user.password
+  );
+
+  if (!passwordIsValid) {
+    return res.status(401).send({ message: "Invalid Password!" });
+  }
+
+  if (user.mac != req.body.mac) {
+    return res.status(401).send({ message: "Invalid Mac Address!" });
+  }
+
+  var token = jwt.sign({ id: user.id }, process.env.JWT_KEY, {
+    expiresIn: 86400, // 24 hours
+  });
+
+  console.log(token);
+
+  var authorities = [];
+
+  for (let i = 0; i < user.roles.length; i++) {
+    authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
+  }
+
+  req.session.token = token;
+
+  res.status(200).send({
+    id: user._id,
+    username: user.username,
+    email: user.email,
+    roles: authorities,
+    accessToken: token,
+  });
+}
+
 const signin = (req, res) => {
 
   console.log(req.body);
-  
-  User.findOne({
-    username: req.body.username,
-  })
-    .populate("roles", "-__v")
-    .exec((err, user) => {
-      if (err) {
-        res.status(500).send({ message: err });
-        return;
-      }
 
-      if (!user) {
-        return res.status(404).send({ message: "User Not found." });
-      }
+  if (req.body.username.includes("@")) {
 
-      var passwordIsValid = bcrypt.compareSync(
-        req.body.password,
-        user.password
-      );
-
-      if (!passwordIsValid) {
-        return res.status(401).send({ message: "Invalid Password!" });
-      }
-
-      if (user.mac != req.body.mac) {
-        return res.status(401).send({ message: "Invalid Mac Address!" });
-      }
-
-      var token = jwt.sign({ id: user.id }, process.env.JWT_KEY, {
-        expiresIn: 86400, // 24 hours
+    User.findOne({
+      email: req.body.username,
+    })
+      .populate("roles", "-__v")
+      .exec((err, user) => {
+        checkAuth(req, res, err, user);
       });
+  }
 
-      console.log(token);
-
-      var authorities = [];
-
-      for (let i = 0; i < user.roles.length; i++) {
-        authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
-      }
-
-      req.session.token = token;
-
-      res.status(200).send({
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        roles: authorities,
-        accessToken: token,
+  else {
+    User.findOne({
+      username: req.body.username,
+    })
+      .populate("roles", "-__v")
+      .exec((err, user) => {
+        checkAuth(req, res, err, user);
       });
-    });
+  }
+
+
 };
 
 const signup = (req, res) => {
@@ -71,7 +92,7 @@ const signup = (req, res) => {
 
   user.save((err, user) => {
     if (err) {
-      console.log("err"+err);
+      console.log("err" + err);
       res.status(500).send({ message: err });
       return;
     }
