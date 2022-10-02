@@ -55,7 +55,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
 
-app.use("/api/user", routesUser);
+app.use("/api/auth", routesUser);
 
 app.get("/api/test/user", [authJwt.verifyToken], (req, res) => {
     res.json({

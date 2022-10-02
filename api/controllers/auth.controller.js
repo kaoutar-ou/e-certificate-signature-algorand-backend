@@ -5,6 +5,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const signin = (req, res) => {
+
+  console.log(req.body);
+  
   User.findOne({
     username: req.body.username,
   })
@@ -28,6 +31,10 @@ const signin = (req, res) => {
         return res.status(401).send({ message: "Invalid Password!" });
       }
 
+      if (user.mac != req.body.mac) {
+        return res.status(401).send({ message: "Invalid Mac Address!" });
+      }
+
       var token = jwt.sign({ id: user.id }, process.env.JWT_KEY, {
         expiresIn: 86400, // 24 hours
       });
@@ -47,6 +54,7 @@ const signin = (req, res) => {
         username: user.username,
         email: user.email,
         roles: authorities,
+        accessToken: token,
       });
     });
 };
