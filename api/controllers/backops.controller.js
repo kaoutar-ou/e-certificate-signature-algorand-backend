@@ -63,7 +63,17 @@ const createEtablissement = async (req, res) => {
 
                 res.status(200).send({ message: "Etablismment is registered successfully!" });
             });
+
+            university.etablissements.push(etablissement);
+            university.save((err) => {
+                if (err) {
+                    res.status(500).send({ message: err });
+                    return;
+                }
+            });
+
         });
+
 
     } catch (err) {
         res.status(500).send({ message: err });
