@@ -4,6 +4,10 @@ const Filiere = mongoose.model(
     "Filiere",
     new mongoose.Schema({
         nom: String,
+        abbr: {
+            type: String,
+            unique: true
+        },
         description: String,
         logo: String,
         date_creation: String,
@@ -19,10 +23,10 @@ const Filiere = mongoose.model(
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Etudiant'
             }],
-        modules: [
+        semestres: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Module'
+                ref: 'Semestre'
             }],
 
 

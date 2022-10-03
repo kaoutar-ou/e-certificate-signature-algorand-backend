@@ -1,6 +1,8 @@
 const models = require("../models");
 const User = models.user;
 const Role = models.role;
+const Filiere = models.filiere;
+const Etudiant = models.etudiant
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -115,13 +117,16 @@ const signup = (req, res) => {
               res.status(500).send({ message: err });
               return;
             }
+            if (req.body.roles.includes("etudiant")) {
+              createEtudiant(req, res, user._id);
+            }
 
             res.send({ message: "User was registered successfully!" });
           });
         }
       );
     } else {
-   
+
       Role.findOne({ name: "etudiant" }, (err, role) => {
         if (err) {
           res.status(500).send({ message: err });
@@ -140,6 +145,64 @@ const signup = (req, res) => {
       });
     }
   });
+};
+
+const createEtudiant = (req, res, user_id) => {
+
+
+  const etudiant = new Etudiant({
+    address: req.body.address,
+    date_naissance: req.body.date_naissance,
+    telephone: req.body.telephone,
+    ville: req.body.ville,
+    pays: req.body.pays,
+    date_inscription: req.body.date_inscription,
+    date_sort: req.body.date_sort,
+    site_web: req.body.site_web,
+    user: user_id,
+
+  });
+
+  console.log(req.body);
+
+  etudiant.save((err, etudiant) => {
+    if (err) {
+      console.log("err" + err);
+      res.status(500).send({ message: err });
+      return;
+    }
+    console.log("etudiant");
+    if (req.body.filiere) {
+      console.log(req.body.filiere);
+      Filiere.findOne(
+        {
+          abbr: req.body.filiere,
+        },
+        (err, filiere) => {
+          if (err) {
+            res.status(500).send({ message: err });
+            return;
+          }
+
+          etudiant.filiere = filiere._id
+          etudiant.save((err) => {
+            if (err) {
+              res.status(500).send({ message: err });
+              return;
+            }
+
+            res.send({ message: "Etudiant was registered successfully!" });
+          });
+        }
+      );
+    } else {
+      res.send({ message: "Etudiant was registered successfully!" });
+    }
+  });
+
+
+
+
 };
 
 module.exports = {
