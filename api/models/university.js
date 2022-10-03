@@ -4,7 +4,7 @@ const University = mongoose.model(
     "University",
     new mongoose.Schema({
         nom: String,
-        abbr : String,
+        abbr: String,
         email: {
             type: "string",
             required: true,
@@ -28,7 +28,7 @@ const University = mongoose.model(
             }
         ]
 
-    }));
+    }, { timestamps: true }));
 
 module.exports = University;
 
