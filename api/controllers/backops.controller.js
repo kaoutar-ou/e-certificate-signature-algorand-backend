@@ -4,6 +4,7 @@ const University = require("../models/university");
 const createUniverse = async (req, res) => {
     const university = new models.university({
         nom: req.body.nom,
+        abbr: req.body.abbr,
         adresse: req.body.adresse,
         telephone: req.body.telephone,
         email: req.body.email,
@@ -30,7 +31,9 @@ const createEtablissement = async (req, res) => {
 
     const etablissement = new models.etablissement({
         nom: req.body.nom,
+        abbr: req.body.abbr,
         adresse: req.body.adresse,
+        email: req.body.email,
         telephone: req.body.telephone,
         code_postal: req.body.code_postal,
         ville: req.body.ville,
@@ -45,7 +48,7 @@ const createEtablissement = async (req, res) => {
 
     try {
 
-        University.findOne({ abbr: "uca" }, (err, university) => {
+        University.findOne({ abbr: "UCA" }, (err, university) => {
             if (err) {
                 res.status(500).send({ message: err });
                 return;
