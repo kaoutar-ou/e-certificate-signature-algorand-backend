@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 var addr = require('os').networkInterfaces()
-const addrMac = addr['Wi-Fi'][0]['mac'];
+const addrMac = addr['Ethernet'][0]['mac'];
 
 app.get("/api/mac", (req, res) => {
     res.json({
