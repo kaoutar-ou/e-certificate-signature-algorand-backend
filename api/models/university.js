@@ -7,7 +7,6 @@ const University = mongoose.model(
         abbr: String,
         email: {
             type: "string",
-            required: true,
             unique: true,
             match:
                 /^[a-zA-Z0-9_.+]*[a-zA-Z][a-zA-Z0-9_.+]*@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
