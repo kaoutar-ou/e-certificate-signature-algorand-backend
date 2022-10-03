@@ -10,6 +10,7 @@ const AnneeUniversitaire = mongoose.model(
         },
         isAdmis: Boolean,
     }
+    , { timestamps: true }
     ));
 
 module.exports = AnneeUniversitaire;

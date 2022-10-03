@@ -9,7 +9,7 @@ const Module = mongoose.model(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Semestre'
         },
-    })
+    }, { timestamps: true })
 );
 
 module.exports = Module;

@@ -4,7 +4,7 @@ const Role = mongoose.model(
   "Role",
   new mongoose.Schema({
     name: String
-  })
+  }, { timestamps: true })
 );
 
 module.exports = Role;
