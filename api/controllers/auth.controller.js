@@ -121,8 +121,8 @@ const signup = (req, res) => {
         }
       );
     } else {
-      console.log("no roles");
-      Role.findOne({ name: "user" }, (err, role) => {
+   
+      Role.findOne({ name: "etudiant" }, (err, role) => {
         if (err) {
           res.status(500).send({ message: err });
           return;
