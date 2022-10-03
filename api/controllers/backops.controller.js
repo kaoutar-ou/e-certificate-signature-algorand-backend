@@ -1,4 +1,5 @@
 const models = require("../models");
+const Etablissement = require("../models/etablissement");
 const University = require("../models/university");
 
 const createUniverse = async (req, res) => {
@@ -81,9 +82,55 @@ const createEtablissement = async (req, res) => {
 }
 
 
+const createFiliere = async (req, res) => {
+    const filiere = new models.filiere({
+        nom: req.body.nom,
+        abbr: req.body.abbr,
+        description: req.body.description,
+        logo: req.body.logo,
+        date_creation: req.body.date_creation,
+        site_web: req.body.site_web,
+        duree: req.body.duree,
+        diplome: req.body.diplome,
+    });
+
+    try {
+
+        Etablissement.findOne({ abbr: req.body.etablissement }, (err, etablissement) => {
+            if (err) {
+                res.status(500).send({ message: err });
+                return;
+            }
+
+            filiere.etablissement = etablissement._id;
+            filiere.save((err) => {
+                if (err) {
+                    res.status(500).send({ message: err });
+                    return;
+                }
+                res.status(200).send({ message: "Filiere is created successfully!" });
+            });
+
+            etablissement.filieres.push(filiere);
+            etablissement.save((err) => {
+                if (err) {
+                    res.status(500).send({ message: err });
+                    return;
+                }
+            });
+
+        });
+
+
+    } catch (err) {
+        res.status(500).send({ message: err });
+    }
+}
+
 module.exports = {
     createUniverse,
-    createEtablissement
+    createEtablissement,
+    createFiliere
 }
 
 

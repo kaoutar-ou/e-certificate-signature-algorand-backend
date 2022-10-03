@@ -12,7 +12,7 @@ const Filiere = mongoose.model(
         logo: String,
         date_creation: String,
         site_web: String,
-        duree: String,
+        duree: Number,
         diplome: String,
         etablissement: {
             type: mongoose.Schema.Types.ObjectId,

@@ -76,9 +76,9 @@ app.use((error, req, res, next) => {
   });
 });
 
-var addr = require('os').networkInterfaces()
-const addrMac = addr['Ethernet'][0]['mac'];
-console.log(addrMac);
+// var addr = require('os').networkInterfaces()
+// const addrMac = addr['Ethernet'][0]['mac'];
+// console.log(addrMac);
 
 
 

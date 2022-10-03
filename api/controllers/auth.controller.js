@@ -5,6 +5,7 @@ const Filiere = models.filiere;
 const Etudiant = models.etudiant
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const AnneeUniversitaire = require("../models/anneeUniversitaire");
 
 
 
@@ -86,11 +87,14 @@ const signup = (req, res) => {
   const user = new User({
     username: req.body.username,
     email: req.body.email,
-    mac: req.body.mac,
     password: bcrypt.hashSync(req.body.password, 8),
   });
 
   console.log(req.body);
+
+  if(req.body.roles && req.body.roles.includes("admin")){
+    user.mac = req.body.mac;
+  }
 
   user.save((err, user) => {
     if (err) {
@@ -158,7 +162,6 @@ const createEtudiant = (req, res, user_id) => {
     pays: req.body.pays,
     date_inscription: req.body.date_inscription,
     date_sort: req.body.date_sort,
-    site_web: req.body.site_web,
     user: user_id,
 
   });
@@ -172,6 +175,24 @@ const createEtudiant = (req, res, user_id) => {
       return;
     }
     console.log("etudiant");
+
+    const year = new Date().getFullYear()
+    const anneeUniversitaire = new AnneeUniversitaire({
+      annee: year+"/"+(year+1),
+      etudiant: etudiant._id,
+    });
+
+    anneeUniversitaire.save((err, anneeUniversitaire) => {
+      if (err) {
+        console.log("err" + err);
+        res.status(500).send({ message: err });
+        return;
+      }
+      console.log("anneeUniversitaire");
+      etudiant.annee_universitaires.push(anneeUniversitaire._id);
+    });
+      
+
     if (req.body.filiere) {
       console.log(req.body.filiere);
       Filiere.findOne(
@@ -191,7 +212,7 @@ const createEtudiant = (req, res, user_id) => {
               return;
             }
 
-            res.send({ message: "Etudiant was registered successfully!" });
+            // res.send({ message: "Etudiant was registered successfully!" });
           });
         }
       );

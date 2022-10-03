@@ -13,7 +13,7 @@ const User = mongoose.model(
       match:
         /^[a-zA-Z0-9_.+]*[a-zA-Z][a-zA-Z0-9_.+]*@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
     },
-    mac : {type :"string", unique : true},
+    mac : String,
     password: { type: "string", required: true },
     roles: [
       {
