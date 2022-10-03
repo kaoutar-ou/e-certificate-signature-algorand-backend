@@ -4,6 +4,8 @@ const User = mongoose.model(
   "User",
   new mongoose.Schema({
     username: String,
+    nom: String,
+    prenom: String,
     email: {
       type: "string",
       required: true,
@@ -11,7 +13,7 @@ const User = mongoose.model(
       match:
         /^[a-zA-Z0-9_.+]*[a-zA-Z][a-zA-Z0-9_.+]*@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
     },
-    mac : {type :"string", required : true, unique : true},
+    mac : {type :"string", unique : true},
     password: { type: "string", required: true },
     roles: [
       {

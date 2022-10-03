@@ -6,8 +6,9 @@ const connectDB = require("./config/db");
 dotenv.config();
 const initial = require("./init");
 const app = express();
-const routesUser = require("./api/routes/user"); 
-const {authJwt} = require("./api/middleware");
+const routesUser = require("./api/routes/user");
+const routesBackops = require("./api/routes/backops");
+const { authJwt } = require("./api/middleware");
 
 var corsOptions = {
   origin: "http://localhost:3000",
@@ -50,35 +51,35 @@ app.use(
   })
 );
 
-// simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
-});
 
+// ? auth routes
 app.use("/api/auth", routesUser);
 
-app.get("/api/test/user", [authJwt.verifyToken], (req, res) => {
-    res.json({
-        message: "User Content.",
-    });
-});
+
+// ? backops routes
+
+app.use("/api/backops", routesBackops);
+
+
+// ? ----------------------------------
 
 app.use((req, res, next) => {
-    const error = new Error("Not found ");
-    error.status = 404;
-    next(error);
+  const error = new Error("Not found ");
+  error.status = 404;
+  next(error);
+});
+app.use((error, req, res, next) => {
+  res.status(error.status || 500).json({
+    error: {
+      message: error.message,
+    },
   });
-  app.use((error, req, res, next) => {
-    res.status(error.status || 500).json({
-      error: {
-        message: error.message,
-      },
-    });
-  });
+});
 
 var addr = require('os').networkInterfaces()
-const addrMac=addr['Wi-Fi'][0]['mac'];
-console.log(addr['Wi-Fi'][0]['mac']);
+const addrMac = addr['Ethernet'][0]['mac'];
+console.log(addrMac);
+
 
 
 // set port, listen for requests
