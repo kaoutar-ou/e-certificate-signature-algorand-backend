@@ -1,0 +1,95 @@
+{
+    "universite": {
+      "id": 1,
+      "nom": "Ecole de la Paix",
+      "adresse": "Rue de la Paix",
+      "code_postal": "75000",
+      "ville": "Paris",
+      "pays": "France",
+      "telephone": "01 23 45 67 89",
+      "email": "fstg@gmail.com",
+      "site_web": "www.fstg.com",
+      "logo": "logo.png",
+      "description": "Ecole de la Paix est une école de formation professionnelle qui propose des formations en alternance dans le domaine de la paix.",
+      "date_creation": "2018-01-01",
+      "etablissements": [
+        {
+          "filieres": [
+            {
+              "id": 1,
+              "nom": "IRISI",
+              "description": "Formation en alternance dans le domaine de la paix",
+              "logo": "logo.png",
+              "date_creation": "2018-01-01",
+              "site_web": "www.filier.com",
+              "duree": "3 ans",
+              "diplome": "Ingénieur d'état",
+              "etudiants": [
+                {
+                  "id": 1,
+                  "nom": "Dupont",
+                  "prenom": "Jean",
+                  "date_naissance": "1990-01-01",
+                  "email": "etudiant@edu.uca.ma",
+                  "telephone": "06 12 34 56 78",
+                  "adresse": "Rue de la Paix",
+                  "code_postal": "75000",
+                  "ville": "Paris",
+                  "pays": "France",
+                  "date_inscription": "2018-01-01",
+                  "date_sortie": "2021-01-01",
+                  "certificats" : [
+                    {
+                      "id": 1,
+                      "date_obtention": "2021-01-01",
+                      "url": "https://www.fichier.com/certificat.pdf"
+                    }
+                  ],
+                  "formations": [
+                    {
+                      "id": 1,
+                      "nom": "Formation 1",
+                      "description": "Formation 1",
+                      "date_debut": "2018-01-01",
+                      "date_fin": "2018-01-01",
+                      "diplome": "formation devops",
+                      "emetteur": [{
+                        "nom": "Ecole de la Paix",
+                        "adresse": "Rue de la Paix",
+                        "code_postal": "75000",
+                        "ville": "Paris",
+                        "pays": "France",
+                        "telephone": "01 23 45 67 89",
+                        "email": "email@gmail.com",
+                        "logo": "logo.png"
+                      }]
+                    }
+                  ],
+                  "annee_univ": {
+                    "id": 1,
+                    "annee": "2018-2019",
+                    "semestres": [
+                      {
+                        "id": 1,
+                        "numero": "1",
+                        "modules": [
+                          {
+                            "id": 1,
+                            "nom": "Module 1",
+                            "description": "Module 1",
+                            "note": "10",
+                            "commentaire": "Très bon note"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+  
