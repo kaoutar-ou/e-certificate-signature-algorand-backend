@@ -26,7 +26,7 @@ const Filiere = mongoose.model(
             }],
 
 
-    }));
+    }, { timestamps: true }));
 
 module.exports = Filiere;
 

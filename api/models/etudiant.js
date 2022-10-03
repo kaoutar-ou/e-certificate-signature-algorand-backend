@@ -29,7 +29,7 @@ const Etudiant = mongoose.model(
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Note'
             }]
-    }
+    }, { timestamps: true }
     ));
 
 module.exports = Etudiant;

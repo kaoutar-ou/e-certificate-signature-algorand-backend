@@ -28,7 +28,7 @@ const Etablissement = mongoose.model(
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Filiere'
             }]
-    }
+    }, { timestamps: true }
     ));
 
 module.exports = Etablissement;

@@ -13,6 +13,6 @@ const Note = mongoose.model(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Module'
         },
-    }));
+    }, { timestamps: true }));
 
 module.exports = Note;
