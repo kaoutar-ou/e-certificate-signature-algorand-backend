@@ -222,6 +222,7 @@ const createEtudiant = (req, res, user_id) => {
       etudiant.annee_universitaires.push(anneeUniversitaire._id);
     });
       
+    etudiant.annee_universitaires.push(anneeUniversitaire._id);
 
     if (req.body.filiere) {
       console.log(req.body.filiere);
