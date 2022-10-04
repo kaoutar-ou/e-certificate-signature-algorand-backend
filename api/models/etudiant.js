@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const Etudiant = mongoose.model(
     "Etudiant",
     new mongoose.Schema({
+        cne: String,
+        code_apogee: String,
         address: String,
         date_naissance: String,
         telephone: String,

@@ -127,10 +127,30 @@ const createFiliere = async (req, res) => {
     }
 }
 
+const getAllFilieres = async (req, res) => {
+    Etablissement.findOne({ abbr: req.query.etablissement })
+    .populate("filieres")
+    .exec((err, etablissement) => {
+        if (err) {
+            res.status(500).send({ message: err });
+            return;
+        }
+        res.status(200).send({ message: "Filiere is created successfully!", etablissement });
+    });
+
+    // try {
+    //     const filieres = await models.filiere.find();
+    //     res.status(200).send(filieres);
+    // } catch (err) {
+    //     res.status(500).send({ message: err });
+    // }
+}
+
 module.exports = {
     createUniverse,
     createEtablissement,
-    createFiliere
+    createFiliere,
+    getAllFilieres
 }
 
 

@@ -79,21 +79,50 @@ const signin = (req, res) => {
         checkAuth(req, res, err, user);
       });
   }
-
-
 };
+
+const generatePassword = (length) => {
+  let characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./*_-+@#$%&";
+  let password = Array(length).fill(characters).map(function(x) { return x[Math.floor(Math.random() * x.length)] }).join('');
+  return password;
+}
+
+const generateEmail = (nom, prenom, role) => {
+  let email = nom + "." + prenom
+  if (role == "etudiant") {
+    email += "@edu.uca.ma";
+  }
+  else if (role == "admin") {
+    email += "@uca.ma";
+  }
+  return email;
+}
+
+const generateUsername = (nom, prenom) => {
+  let username = nom + "." + prenom;
+  return username;
+}
 
 const signup = (req, res) => {
   const user = new User({
-    username: req.body.username,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8),
+    nom: req.body.nom,
+    prenom: req.body.prenom,
+    cin: req.body.cin,
   });
+
+  user.username = generateUsername(user.nom, user.prenom);
+  user.password = generatePassword(16);
 
   console.log(req.body);
 
-  if(req.body.roles && req.body.roles.includes("admin")){
-    user.mac = req.body.mac;
+  if(req.body.roles) { 
+    if (req.body.roles.includes("admin")){
+      user.email = generateEmail(user.nom, user.prenom, "admin");
+      user.mac = req.body.mac;
+    }
+    else if (req.body.roles.includes("etudiant")){
+      user.email = generateEmail(user.nom, user.prenom, "etudiant");
+    }
   }
 
   user.save((err, user) => {
@@ -161,12 +190,13 @@ const createEtudiant = (req, res, user_id) => {
     ville: req.body.ville,
     pays: req.body.pays,
     date_inscription: req.body.date_inscription,
-    date_sort: req.body.date_sort,
     user: user_id,
 
   });
 
   console.log(req.body);
+
+  etudiant.date_sort = "12/10/2031"
 
   etudiant.save((err, etudiant) => {
     if (err) {
