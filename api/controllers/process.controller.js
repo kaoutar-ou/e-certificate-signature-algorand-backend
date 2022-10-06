@@ -17,7 +17,7 @@ const certif = (filename) => {
 const generateCertificate = async (req, res) => {
     const data_ = {
         test: {
-            fullName: "Bencharef Omar",
+            fullName: req.body.fullName,
             image: certif('certiff.png'),
             fileName : "index19.pdf"
         }
