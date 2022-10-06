@@ -8,10 +8,11 @@ const initial = require("./init");
 const app = express();
 const routesUser = require("./api/routes/user");
 const routesBackops = require("./api/routes/backops");
+const routesProcess = require("./api/routes/process");
 const { authJwt } = require("./api/middleware");
 
 var corsOptions = {
-  origin: "http://localhost:3000",
+  origin: "http://localhost:22840",
 };
 
 app.use(cors(corsOptions));
@@ -59,6 +60,10 @@ app.use("/api/auth", routesUser);
 // ? backops routes
 
 app.use("/api/backops", routesBackops);
+
+// ? process routes
+
+app.use("/api/process", routesProcess);
 
 
 // ? ----------------------------------
