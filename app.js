@@ -9,6 +9,7 @@ const app = express();
 const routesUser = require("./api/routes/user");
 const routesBackops = require("./api/routes/backops");
 const routesProcess = require("./api/routes/process");
+const routesUpload = require("./api/routes/upload");
 const { authJwt } = require("./api/middleware");
 
 var corsOptions = {
@@ -64,6 +65,10 @@ app.use("/api/backops", routesBackops);
 // ? process routes
 
 app.use("/api/process", routesProcess);
+
+// ? upload routes
+
+app.use("/api/upload", routesUpload);
 
 
 // ? ----------------------------------

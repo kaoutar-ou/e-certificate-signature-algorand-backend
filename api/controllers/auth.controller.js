@@ -6,6 +6,7 @@ const Etudiant = models.etudiant
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const AnneeUniversitaire = require("../models/anneeUniversitaire");
+const { generateUsername, generatePassword, generateEmail, getNewAnneeUniversitaire } = require("../utils/user");
 
 
 
@@ -81,27 +82,7 @@ const signin = (req, res) => {
   }
 };
 
-const generatePassword = (length) => {
-  let characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./*_-+@#$%&";
-  let password = Array(length).fill(characters).map(function(x) { return x[Math.floor(Math.random() * x.length)] }).join('');
-  return password;
-}
 
-const generateEmail = (nom, prenom, role) => {
-  let email = nom + "." + prenom
-  if (role == "etudiant") {
-    email += "@edu.uca.ma";
-  }
-  else if (role == "admin") {
-    email += "@uca.ma";
-  }
-  return email;
-}
-
-const generateUsername = (nom, prenom) => {
-  let username = nom + "." + prenom;
-  return username;
-}
 
 const signup = (req, res) => {
   const user = new User({
@@ -191,7 +172,8 @@ const createEtudiant = (req, res, user_id) => {
     pays: req.body.pays,
     date_inscription: req.body.date_inscription,
     user: user_id,
-
+    cne: row.cne,
+    code_apogee: row.code_apogee,
   });
 
   console.log(req.body);
@@ -206,9 +188,8 @@ const createEtudiant = (req, res, user_id) => {
     }
     console.log("etudiant");
 
-    const year = new Date().getFullYear()
     const anneeUniversitaire = new AnneeUniversitaire({
-      annee: year+"/"+(year+1),
+      annee: getNewAnneeUniversitaire(),
       etudiant: etudiant._id,
     });
 
@@ -222,7 +203,6 @@ const createEtudiant = (req, res, user_id) => {
       etudiant.annee_universitaires.push(anneeUniversitaire._id);
     });
       
-    etudiant.annee_universitaires.push(anneeUniversitaire._id);
 
     if (req.body.filiere) {
       console.log(req.body.filiere);

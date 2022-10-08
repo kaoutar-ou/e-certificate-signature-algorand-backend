@@ -12,14 +12,12 @@ const certif = (filename) => {
 }
 
 
-
-
 const generateCertificate = async (req, res) => {
     const data_ = {
         test: {
             fullName: req.body.fullName,
             image: certif('certiff.png'),
-            fileName : "index19.pdf"
+            fileName : "index199.pdf"
         }
     };
     const fileName=  await process.generateCertificate(data_);
