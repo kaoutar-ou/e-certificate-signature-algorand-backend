@@ -10,14 +10,6 @@ const compile = async function (templateName, data) {
     const html = await fs.readFile(filePath, 'utf-8');
     return hbs.compile(html)(data);
 }
-// function base64Encode(file) {
-//     return fs.readFileSync(file, { encoding: 'base64' });
-// }
-
-// const certif = (filename) => {
-//    return "data:image/png;base64," + base64Encode(filename);
-// }
-
 
 
 const generateCertificate = async (data_) => {
