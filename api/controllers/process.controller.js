@@ -70,7 +70,9 @@ const image = (filename) => {
 
 const generateCertificate = async (req, res) => {
     const fullname = req.body.fullName;
-    const filename = fullname.replace(/\s/g, '-').toLowerCase();
+    const plus_info = fullname +"_"+ req.body.filiere + "_" + req.body.annee_univ;
+
+    const filename = plus_info.replace(/\s/g, '-').toLowerCase();
     const data_ = {
         test: {
             fullName: fullname,
