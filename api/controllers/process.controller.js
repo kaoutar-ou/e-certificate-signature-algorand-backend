@@ -39,12 +39,20 @@ const decryptFilename = (encrypted) => {
 }
 
 const generateQRCode = async (data_) => {
-    const data = encryptFilename(data_)
-    var qr_url = "https://www.uca.ma/" + data;
+
+    const infos = data_.split('_');
+    const object = {
+        filename : data_,
+        fullname: infos[0],
+        filiere: infos[1],
+        annee_univ: infos[2],
+    }
+    const encrypted = encryptFilename(JSON.stringify(object));
+    var qr_url = "https://www.uca.ma/verification/" + encrypted;
     const opts = {
         errorCorrectionLevel: 'H',
         type: 'terminal',
-        quality: 0.95,
+        quality: 1,
         margin: 1,
         color: {
             dark: '#208698',
@@ -58,7 +66,7 @@ const generateQRCode = async (data_) => {
         QRCode.toFile(path.join(FILE_PATH, `${data_}.png`), qr_url, opts, function (err) {
             if (err) reject(err)
             resolve(true)
-            console.log("decrypted", decryptFilename(data));
+            console.log("decrypted", JSON.parse(decryptFilename(encrypted)));
         })
     })
 
@@ -70,7 +78,7 @@ const image = (filename) => {
 
 const generateCertificate = async (req, res) => {
     const fullname = req.body.fullName;
-    const plus_info = fullname +"_"+ req.body.filiere + "_" + req.body.annee_univ;
+    const plus_info = fullname + "_" + req.body.filiere + "_" + req.body.annee_univ;
 
     const filename = plus_info.replace(/\s/g, '-').toLowerCase();
     const data_ = {
