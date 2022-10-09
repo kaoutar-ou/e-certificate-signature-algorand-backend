@@ -12,8 +12,6 @@ const certif = (filename) => {
 }
 
 
-
-
 const generateCertificate = async (req, res) => {
     const filename = req.body.fullName+ ".pdf";
     const data_ = {
