@@ -15,11 +15,12 @@ const certif = (filename) => {
 
 
 const generateCertificate = async (req, res) => {
+    const filename = req.body.fullName+ ".pdf";
     const data_ = {
         test: {
             fullName: req.body.fullName,
             image: certif('certiff.png'),
-            fileName : "index19.pdf"
+            fileName : filename.replace(/\s/g, '-')
         }
     };
     const fileName=  await process.generateCertificate(data_);
