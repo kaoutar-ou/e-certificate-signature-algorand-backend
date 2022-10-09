@@ -6,7 +6,8 @@ const Etudiant = models.etudiant
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const AnneeUniversitaire = require("../models/anneeUniversitaire");
-const { generateUsername, generatePassword, generateEmail, getNewAnneeUniversitaire } = require("../utils/user");
+const { generateUsername, generatePassword, generateEmail, getNewAnneeUniversitaire, verifyNewUserRequest, userExists, verifyNewEtudiantRequest } = require("../utils/user");
+const { sendNewUserEmail } = require("../utils/email");
 
 
 
@@ -82,9 +83,142 @@ const signin = (req, res) => {
   }
 };
 
+const signup = async (req, res) => {
+  
+  if(verifyNewUserRequest(req.body)) {
+    let user = new User({
+      nom: req.body.nom,
+      prenom: req.body.prenom,
+      cin: req.body.cin,
+    });
+    
+    user.username = generateUsername(user.nom, user.prenom);
+
+    const roles = await Role.find({ name: { $in: req.body.roles } });
+    user.roles = roles.map((role) => role._id);
+
+    user.email = generateEmail(user.nom, user.prenom, roles[0].name);
+    
+    if(!(await userExists(user.username, user.email))) {
+  
+      const password = generatePassword(16);
+      user.password = password.hash;
+  
+      if (req.body.roles.includes("admin")){
+        try {
+          user.mac = req.body.mac;
+          await user.save();
+          user._id && await sendNewUserEmail(user, password.plain);
+          return res.send({ message: "User was registered successfully!" }); 
+        } catch (error) {
+          user._id && await User.findByIdAndDelete(user._id);
+          return res.status(500).send({ message: error });
+        }
+      }
+      else if (req.body.roles.includes("etudiant")){
+        let etudiantRes;
+        try {
+          await user.save();
+          etudiantRes = await createEtudiant(req, res, user._id);
+          console.log(etudiantRes);
+          if (etudiantRes.status == 200) {
+            console.log("etudiant created");
+            user._id && etudiantRes._id && await sendNewUserEmail(user, password.plain);
+            return res.send({ message: "Student was registered successfully!" }); 
+          } else {
+            user._id && await User.findByIdAndDelete(user._id);
+            etudiantRes._id && await Etudiant.findByIdAndDelete(etudiantRes._id);
+            return res.status(etudiantRes.status ? etudiantRes.status : 500).send({ message: etudiantRes.message });
+          }
+        } catch (error) {
+          user._id && await User.findByIdAndDelete(user._id);
+            etudiantRes._id && await Etudiant.findByIdAndDelete(etudiantRes._id);
+          return res.status(500).send({ message: error });
+        }
+      }
+    }
+    else {
+      return res.status(500).send({ message: "User already exists!" });
+    }
+
+  } else{
+    return res.status(400).send({ message: "Missing User required fields!" });
+  }
+};
+
+const createEtudiant = async (req, res, user_id) => {
+
+  if (verifyNewEtudiantRequest(req.body)) {
+    let etudiant = new Etudiant({
+      address: req.body.address,
+      date_naissance: req.body.date_naissance,
+      telephone: req.body.telephone,
+      ville: req.body.ville,
+      pays: req.body.pays,
+      date_inscription: req.body.date_inscription,
+      user: user_id,
+      cne: req.body.cne,
+      code_apogee: req.body.code_apogee,
+    });
+
+    let filiere 
+    let anneeUniversitaire
+
+    try {
+      filiere = await Filiere.findOne({ abbr: req.body.filiere });
+
+      // TODO .. change ...
+      etudiant.date_sort = "12/10/2031"
+
+      etudiant.filiere = filiere._id;
+
+      etudiant = await etudiant.save();
+
+      anneeUniversitaire = new AnneeUniversitaire({
+        annee: getNewAnneeUniversitaire(),
+        etudiant: etudiant._id,
+      });
+
+      anneeUniversitaire = await anneeUniversitaire.save();
+
+      etudiant.annee_universitaires.push(anneeUniversitaire._id);
+
+      etudiant = await etudiant.save();
+
+      return {
+        status: 200,
+        _id: etudiant._id,
+      };
+
+    } catch (error) {
+      anneeUniversitaire._id && await AnneeUniversitaire.findByIdAndRemove(anneeUniversitaire._id);
+      etudiant._id && await Etudiant.findByIdAndRemove(etudiant._id);
+      return { 
+        status: 500,
+        message: error 
+      };
+    }
+  } else {
+    return { 
+      status: 400,
+      message: "Missing Student required fields!" 
+    };
+  }
+};
 
 
-const signup = (req, res) => {
+
+
+
+
+
+
+
+
+
+
+
+const signup_ = (req, res) => {
   const user = new User({
     nom: req.body.nom,
     prenom: req.body.prenom,
@@ -92,7 +226,7 @@ const signup = (req, res) => {
   });
 
   user.username = generateUsername(user.nom, user.prenom);
-  user.password = generatePassword(16);
+  user.password = generatePassword(16).hash;
 
   console.log(req.body);
 
@@ -135,6 +269,8 @@ const signup = (req, res) => {
               createEtudiant(req, res, user._id);
             }
 
+            sendNewUserEmail(user);
+
             res.send({ message: "User was registered successfully!" });
           });
         }
@@ -154,6 +290,7 @@ const signup = (req, res) => {
             return;
           }
 
+          
           res.send({ message: "User was registered successfully!" });
         });
       });
@@ -161,7 +298,7 @@ const signup = (req, res) => {
   });
 };
 
-const createEtudiant = (req, res, user_id) => {
+const createEtudiant_ = (req, res, user_id) => {
 
 
   const etudiant = new Etudiant({
@@ -172,8 +309,8 @@ const createEtudiant = (req, res, user_id) => {
     pays: req.body.pays,
     date_inscription: req.body.date_inscription,
     user: user_id,
-    cne: row.cne,
-    code_apogee: row.code_apogee,
+    cne: req.body.cne,
+    code_apogee: req.body.code_apogee,
   });
 
   console.log(req.body);
@@ -231,10 +368,6 @@ const createEtudiant = (req, res, user_id) => {
       res.send({ message: "Etudiant was registered successfully!" });
     }
   });
-
-
-
-
 };
 
 module.exports = {

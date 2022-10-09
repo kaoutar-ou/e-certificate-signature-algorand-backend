@@ -1,6 +1,7 @@
 const models = require("../models");
 const Etablissement = require("../models/etablissement");
 const University = require("../models/university");
+const { sendEmail } = require("../utils/email");
 
 const createUniverse = async (req, res) => {
     const university = new models.university({
@@ -146,11 +147,32 @@ const getAllFilieres = async (req, res) => {
     // }
 }
 
+const sendEmailTest = async (req, res) => {
+    let text_ = "Hello world from Node.js";
+    let html_ = `
+        <h1>Test email</h1>
+        <p>Test email</p>
+    `;
+    let options = {
+        to: req.body.to,
+        subject: req.body.subject,
+        text: text_,
+        html: html_,
+    }
+    try {
+        const sent = await sendEmail(options);
+        res.status(200).send({ message: "Email sent successfully ! ", sent });
+    } catch (err) {
+        res.status(500).send({ message: err });
+    }
+}
+
 module.exports = {
     createUniverse,
     createEtablissement,
     createFiliere,
-    getAllFilieres
+    getAllFilieres,
+    sendEmailTest
 }
 
 

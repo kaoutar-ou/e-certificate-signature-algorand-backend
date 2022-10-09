@@ -86,7 +86,7 @@ const excelEtudiantRowCheck = (row) => {
   }
 };
 
-const uploadExcel = async (req, res) => {
+const uploadExcelEtudiant = async (req, res) => {
   let path = basedir + "/resources/uploads/" + req.file.filename;
 
   let studentCount = 0;
@@ -139,7 +139,7 @@ const uploadExcel = async (req, res) => {
                       cin: row.cin,
                       email: generateEmail(row.nom, row.prenom, "etudiant"),
                       username: generateUsername(row.nom, row.prenom),
-                      password: generatePassword(16),
+                      password: generatePassword(16).hash,
                     });
 
                     user.roles = [role._id];
@@ -234,5 +234,5 @@ const uploadExcel = async (req, res) => {
 };
 
 module.exports = {
-  uploadExcel,
+  uploadExcelEtudiant,
 };
