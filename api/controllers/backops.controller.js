@@ -3,6 +3,7 @@ const AnneeUniversitaire = require("../models/anneeUniversitaire");
 const Certificat = require("../models/certificat");
 const Etablissement = require("../models/etablissement");
 const Etudiant = require("../models/etudiant");
+const Module = require("../models/module");
 const University = require("../models/university");
 const { sendEmail } = require("../utils/email");
 
@@ -206,8 +207,6 @@ const getAllEtudiants = async (req, res) => {
         anneeUniversitaires = await AnneeUniversitaire.find({ filiere: filiere._id, isAdmis: false });
         anneeUniversitaireIds = anneeUniversitaires.map(anneeUniversitaire => anneeUniversitaire._id);
 
-        console.log(anneeUniversitaireIds);
-
         let array = [];
         for (let index = 0; index < filiere.duree; index++) {
             array.push({ [`annee_universitaires.${index}`]: { $in : anneeUniversitaireIds } });
@@ -283,7 +282,7 @@ const getAllEtudiants = async (req, res) => {
         ]
     };
     try {
-        console.log(query);
+        // console.log(query);
         const etudiants = await Etudiant.find(query)
             .sort({ date_creation: -1 })
             .limit(size)
@@ -307,6 +306,23 @@ const getAllEtudiants = async (req, res) => {
     }
 }
 
+
+const saveModule = async (req, res) => {
+    const module = new Module({
+        nom: req.body.nom,
+        // abbr: req.body.abbr,
+        // filiere: req.body.filiere,
+        semestre: req.body.semestre,
+        // coefficient: req.body.coefficient,
+    });
+
+    try {
+        const savedModule = await module.save();
+        res.status(200).send(savedModule);
+    } catch (err) {
+        res.status(500).send({ message: err });
+    }
+}
 
 module.exports = {
     createUniverse,
