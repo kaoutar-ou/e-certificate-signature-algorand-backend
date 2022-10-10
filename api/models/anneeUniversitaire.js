@@ -8,7 +8,20 @@ const AnneeUniversitaire = mongoose.model(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Etudiant'
         },
-        isAdmis: Boolean,
+        filiere: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Filiere",
+        },
+        notes: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Note'
+            }
+        ],
+        isAdmis: {
+            type: Boolean,
+            default: false
+        },
     }
     , { timestamps: true }
     ));

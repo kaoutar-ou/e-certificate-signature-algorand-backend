@@ -132,11 +132,12 @@ const signup = async (req, res) => {
           }
         } catch (error) {
           user._id && await User.findByIdAndDelete(user._id);
-            etudiantRes._id && await Etudiant.findByIdAndDelete(etudiantRes._id);
+          etudiantRes._id && await Etudiant.findByIdAndDelete(etudiantRes._id);
+          etudiantRes._id && await Filiere.findByIdAndUpdate(etudiantRes.filiereID, { $pull: { etudiants: etudiantRes._id } });
           return res.status(500).send({ message: error });
         }
       }
-    }
+    } 
     else {
       return res.status(500).send({ message: "User already exists!" });
     }
@@ -170,13 +171,14 @@ const createEtudiant = async (req, res, user_id) => {
       // TODO .. change ...
       etudiant.date_sort = "12/10/2031"
 
-      etudiant.filiere = filiere._id;
+      // etudiant.filiere = filiere._id;
 
       etudiant = await etudiant.save();
 
       anneeUniversitaire = new AnneeUniversitaire({
         annee: getNewAnneeUniversitaire(),
         etudiant: etudiant._id,
+        filiere: filiere._id,
       });
 
       anneeUniversitaire = await anneeUniversitaire.save();
@@ -185,14 +187,18 @@ const createEtudiant = async (req, res, user_id) => {
 
       etudiant = await etudiant.save();
 
+      filiere.etudiants.push(etudiant._id);
+
       return {
         status: 200,
         _id: etudiant._id,
+        filiereID: filiere._id,
       };
 
     } catch (error) {
       anneeUniversitaire._id && await AnneeUniversitaire.findByIdAndRemove(anneeUniversitaire._id);
       etudiant._id && await Etudiant.findByIdAndRemove(etudiant._id);
+      filiere._id && await Filiere.findByIdAndUpdate(filiere._id, { $pull: { etudiants: etudiant._id } });
       return { 
         status: 500,
         message: error 

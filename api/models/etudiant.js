@@ -12,6 +12,10 @@ const Etudiant = mongoose.model(
         pays: String,
         date_inscription: String,
         date_sort: String,
+        // valide: {
+        //     type: Boolean,
+        //     default: false
+        // },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
@@ -20,17 +24,18 @@ const Etudiant = mongoose.model(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Filiere'
         },
+        certificats: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Certificat'
+            }
+        ],
         annee_universitaires: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'AnneeUniversitaire'
             }
         ],
-        notes: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Note'
-            }]
     }, { timestamps: true }
     ));
 

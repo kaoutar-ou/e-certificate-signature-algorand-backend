@@ -1,5 +1,8 @@
 const models = require("../models");
+const AnneeUniversitaire = require("../models/anneeUniversitaire");
+const Certificat = require("../models/certificat");
 const Etablissement = require("../models/etablissement");
+const Etudiant = require("../models/etudiant");
 const University = require("../models/university");
 const { sendEmail } = require("../utils/email");
 
@@ -167,12 +170,151 @@ const sendEmailTest = async (req, res) => {
     }
 }
 
+
+
+const getAllEtudiants = async (req, res) => {
+
+    const filiereAbbr = req.query.filiere;
+    const searchString = req.query.search;
+    const valide = req.query.valide;
+    const certified = req.query.certified;
+    const size = req.query.size ? req.query.size : 15;
+    const page = req.query.page >= 1 ? req.query.page - 1 : 0;
+
+    const filiere = await models.filiere.findOne({ abbr: filiereAbbr });
+
+    let query = {};
+    let filiereQuery = {};
+    let valideQuery = {};
+    let certifiedQuery = {};
+    let searchQuery = {};
+    let users;
+    let certificats;
+
+    let anneeUniversitaires;
+    let anneeUniversitaireIds = [];
+
+    if (filiere && filiere._id) {
+        anneeUniversitaires = await AnneeUniversitaire.find({ filiere: filiere._id });
+        anneeUniversitaireIds = anneeUniversitaires.map(anneeUniversitaire => anneeUniversitaire._id);
+
+        filiereQuery = { annee_universitaires : { $in : anneeUniversitaireIds } };
+    }
+
+    if (valide == false) {
+
+        anneeUniversitaires = await AnneeUniversitaire.find({ filiere: filiere._id, isAdmis: false });
+        anneeUniversitaireIds = anneeUniversitaires.map(anneeUniversitaire => anneeUniversitaire._id);
+
+        console.log(anneeUniversitaireIds);
+
+        let array = [];
+        for (let index = 0; index < filiere.duree; index++) {
+            array.push({ [`annee_universitaires.${index}`]: { $in : anneeUniversitaireIds } });
+        }
+
+        valideQuery = { $or: array };
+    }
+
+    if (valide == true) {
+        anneeUniversitaires = await AnneeUniversitaire.find({ filiere: filiere._id, isAdmis: true });
+        anneeUniversitaireIds = anneeUniversitaires.map(anneeUniversitaire => anneeUniversitaire._id);
+
+        let array = [];
+        for (let index = 0; index < filiere.duree; index++) {
+            array.push({ [`annee_universitaires.${index}`]: { $exists: true, $in: anneeUniversitaireIds } });
+        }
+        
+        valideQuery = { $and: array };
+    }
+
+    if (certified == true) {
+        certificats = Certificat.find(
+            { 
+                filiere: filiere._id,
+            },
+        )
+
+        let certificatIds = [];
+
+        if(certificats && certificats.length > 0) {
+            certificatIds = certificats.map(certificat => certificat._id);
+        }
+        
+        certifiedQuery = { certificats: { $in: certificatIds } };
+    }
+
+    if (certified == false) {
+        certifiedQuery = { 
+            "certificats.0": { $exists: false }
+        };
+    }
+    
+    if(searchString && searchString.length > 0) {
+        
+        users = await models.user.find({ 
+            $or: [
+                { nom: { $regex: searchString, $options: "i" } } ,
+                { prenom: { $regex: searchString, $options: "i" } },
+            ]
+        });
+
+        let userIds = [];
+
+        if(users && users.length > 0) {
+            userIds = users.map(user => user._id);
+        }
+        
+        searchQuery = { 
+            $or: [
+                { telephone: { $regex: searchString, $options: "i" } },
+                { user: { $in: userIds } },
+            ]
+         };
+
+    }
+
+    query = {
+        $and: [
+            filiereQuery,
+            valideQuery,
+            certifiedQuery,
+            searchQuery,
+        ]
+    };
+    try {
+        console.log(query);
+        const etudiants = await Etudiant.find(query)
+            .sort({ date_creation: -1 })
+            .limit(size)
+            .skip(size * page)
+            .populate("user")
+            .populate("annee_universitaires")
+            // .populate({
+            //     path: "annee_universitaires",
+            //     populate: {
+            //         path: "filiere",
+            //         model: "Filiere",
+            //     },
+            // })
+            .exec();
+        
+        res.status(200).send(etudiants);
+        
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ message: err });
+    }
+}
+
+
 module.exports = {
     createUniverse,
     createEtablissement,
     createFiliere,
     getAllFilieres,
-    sendEmailTest
+    sendEmailTest,
+    getAllEtudiants
 }
 
 

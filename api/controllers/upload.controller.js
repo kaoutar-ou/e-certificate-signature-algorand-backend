@@ -107,6 +107,8 @@ const uploadExcelEtudiant = async (req, res) => {
 
     let totalRows = 0;
 
+    let anneeUniversitaire;
+
     if (filiere) {
       filiereID = filiere._id;
     }
@@ -163,17 +165,31 @@ const uploadExcelEtudiant = async (req, res) => {
 
                     filiereAbbr = row.filiere.toUpperCase();
 
-                    if (filiereID != null) {
-                      etudiant.filiere = filiereID;
-                    } else {
+                    // if (filiereID != null) {
+                    //   etudiant.filiere = filiereID;
+                    // } else {
+                    //   filiere = await Filiere.findOne({ abbr: filiereAbbr });
+                    //   etudiant.filiere = filiere._id;
+                    // }
+
+                    if (filiereID == null) {
                       filiere = await Filiere.findOne({ abbr: filiereAbbr });
-                      etudiant.filiere = filiere._id;
+                      filiereID = filiere._id;
                     }
 
-                    let anneeUniversitaire = new AnneeUniversitaire({
-                      annee: getNewAnneeUniversitaire(),
-                      etudiant: etudiant._id,
-                    });
+                    if(row.annee_universitaire){
+                      anneeUniversitaire = new AnneeUniversitaire({
+                        annee: row.annee_universitaire,
+                        etudiant: etudiant._id,
+                        filiere: filiereID
+                      });
+                    } else {
+                      anneeUniversitaire = new AnneeUniversitaire({
+                        annee: getNewAnneeUniversitaire(),
+                        etudiant: etudiant._id,
+                        filiere: filiereID
+                      });
+                    }
 
                     anneeUniversitaire = await anneeUniversitaire.save();
 
@@ -181,6 +197,10 @@ const uploadExcelEtudiant = async (req, res) => {
 
                     etudiant = await etudiant.save();
 
+                    filiere.etudiants.push(etudiant._id);
+
+                    // TODO .. uncomment ...
+                    // user._id && etudiant._id && sendNewUserEmail(user, password.plain);
                     studentCount += 1;
                   }
                 }
