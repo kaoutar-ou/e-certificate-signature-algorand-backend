@@ -13,7 +13,7 @@ const routesUpload = require("./api/routes/upload");
 const { authJwt } = require("./api/middleware");
 
 var corsOptions = {
-  origin: "http://localhost:22840",
+  origin: "*",
 };
 
 app.use(cors(corsOptions));
