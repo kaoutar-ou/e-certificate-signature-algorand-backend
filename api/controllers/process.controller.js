@@ -140,7 +140,7 @@ const generateForAllStudents = async (req, res) => {
 
 
     if (students.length > 0 && signers.length> 0 && titre_diplome!=="" && template!=="" && date!=="" && local!=="" && filiere!=="") {
-        students.forEach(async (student) => {
+        Promise.any(students.map(async (student) => {
             const plus_info = student.fullName + "_" + filiere + "_" + student.annee_univ;
             const filename = plus_info.replace(/\s/g, '-').toLowerCase();
             const data_ = {
@@ -168,12 +168,19 @@ const generateForAllStudents = async (req, res) => {
             })
             const fileName = await process_.generateCertificate(data_);
             const hash = await process_.hashDocument(data_.test.fileName);
+        })).then(() => {
 
+            res.status(200).json({
+                message: "certificates generated successfully",
+            })
+        }).catch((err) => {
+            res.status(500).json({
+                message: "error while generating certificates",
+                error: err
+            })
         })
-
-        res.status(200).json({
-            message: "certificates generated successfully",
-        })
+      
+       
     }
     else {
         res.status(400).json({
