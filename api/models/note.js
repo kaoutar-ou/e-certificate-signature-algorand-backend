@@ -13,6 +13,10 @@ const Note = mongoose.model(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Module'
         },
+        annee_universitaire: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'AnneeUniversitaire'
+        }
     }, { timestamps: true }));
 
 module.exports = Note;

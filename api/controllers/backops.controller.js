@@ -4,6 +4,7 @@ const Certificat = require("../models/certificat");
 const Etablissement = require("../models/etablissement");
 const Etudiant = require("../models/etudiant");
 const Module = require("../models/module");
+const Semestre = require("../models/semestre");
 const University = require("../models/university");
 const { sendEmail } = require("../utils/email");
 
@@ -307,21 +308,114 @@ const getAllEtudiants = async (req, res) => {
 }
 
 
-const saveModule = async (req, res) => {
-    const module = new Module({
-        nom: req.body.nom,
-        // abbr: req.body.abbr,
-        // filiere: req.body.filiere,
-        semestre: req.body.semestre,
-        // coefficient: req.body.coefficient,
+const createSemestreNum = (semestre) => {
+    return "S" + semestre;
+}
+
+
+// TODO : verify request body
+const createSemestre = async (req, res) => {
+
+    const filiereAbbr = req.body.filiere;
+
+    if (filiereAbbr == null || filiereAbbr.length == 0) {
+        res.status(400).send({ message: "Filiere is required" });
+        return;
+    }
+
+    let numSemestre = req.body.num;
+
+    if (numSemestre == null || numSemestre.length == 0) {
+        res.status(400).send({ message: "Semestre number is required" });
+        return;
+    }
+
+    numSemestre = createSemestreNum(numSemestre);
+
+    const filiere = await models.filiere.findOne({ abbr: filiereAbbr.toUpperCase() });
+
+    const existantSemestre = await models.semestre.findOne({ filiere: filiere._id, num: numSemestre });
+
+    console.log(existantSemestre);
+
+    if (existantSemestre != null && existantSemestre != undefined) {
+        res.status(400).send({ message: "Semestre already exist" });
+        return;
+    }
+
+    const semestre = new Semestre({
+        num: numSemestre,
+        filiere: filiere._id,
     });
 
     try {
-        const savedModule = await module.save();
-        res.status(200).send(savedModule);
+        const savedSemestre = await semestre.save();
+        res.status(200).send({
+            message : "Semestre added successfully !",
+        });
     } catch (err) {
         res.status(500).send({ message: err });
     }
+    
+}
+
+
+
+const createModule = async (req, res) => {
+    
+    const filiereAbbr = req.body.filiere;
+    const semestreNum = createSemestreNum(req.body.semestre);
+
+    if (filiereAbbr == null || filiereAbbr.length == 0) {
+        res.status(400).send({ message: "Filiere is required" });
+        return;
+    }
+
+    if (semestreNum == null || semestreNum.length == 0) {
+        res.status(400).send({ message: "Semestre is required" });
+        return;
+    }
+
+    const filiere = await models.filiere.findOne({ abbr: filiereAbbr.toUpperCase() });
+
+    const semestre = await models.semestre.findOne({ filiere: filiere._id, num: semestreNum });
+
+    if (filiere == null || filiere == undefined) {
+        res.status(400).send({ message: "Filiere not found" });
+        return;
+    }
+
+    if (semestre == null || semestre == undefined) {
+        res.status(400).send({ message: "Semestre not found" });
+        return;
+    }
+
+    const existantModule = await models.module.findOne({ semestre: semestre._id, nom: req.body.nom });
+
+    if (existantModule != null && existantModule != undefined) {
+        res.status(400).send({ message: "Module already exist" });
+        return;
+    }
+    
+    
+    const module = new Module({
+        nom: req.body.nom,
+        description: req.body.description,
+        semestre: semestre._id,
+    });
+
+    semestre.modules.push(module._id);
+    
+    try {
+        await semestre.save();
+        const savedModule = await module.save();
+        res.status(200).send({
+            message : "Module added successfully !",
+        });
+    } catch (err) {
+        res.status(500).send({ message: err });
+    }
+
 }
 
 module.exports = {
@@ -330,7 +424,9 @@ module.exports = {
     createFiliere,
     getAllFilieres,
     sendEmailTest,
-    getAllEtudiants
+    getAllEtudiants,
+    createSemestre,
+    createModule
 }
 
 
