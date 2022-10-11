@@ -88,7 +88,7 @@ const generateCertificate = async (req, res) => {
     const mention = req.body.mention;
     const titre_diplome = req.body.titre_diplome;
     const ministere = req.body.ministere;
-    const presidence = req.body.presidence; 
+    const presidence = req.body.presidence;
     const etablissement = req.body.etablissement;
     const template = req.body.template;
 
@@ -109,9 +109,9 @@ const generateCertificate = async (req, res) => {
             cne,
             mention,
             titre_diplome,
-            ministere:ministere? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
-            presidence:presidence? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)): null,
-            etablissement:etablissement? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
+            ministere: ministere ? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
+            presidence: presidence ? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)) : null,
+            etablissement: etablissement ? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
             fileName: path.join(process.cwd(), 'uploads', 'certificates', `${filename}` + '.pdf')
         }
     };
@@ -120,11 +120,12 @@ const generateCertificate = async (req, res) => {
     })
     const fileName = await process_.generateCertificate(data_);
     const hash = await process_.hashDocument(data_.test.fileName);
-    
+
 
 }
 
 const generateForAllStudents = async (req, res) => {
+
     const students = req.body.students;
     const signers = req.body.signers;
     const date = req.body.date;
@@ -132,46 +133,54 @@ const generateForAllStudents = async (req, res) => {
     const filiere = req.body.filiere;
     const titre_diplome = req.body.titre_diplome;
     const ministere = req.body.ministere;
-    const presidence = req.body.presidence; 
+    const presidence = req.body.presidence;
     const etablissement = req.body.etablissement;
     const template = req.body.template;
 
-    students.forEach(async (student) => {
-        const plus_info = student.fullName + "_" + filiere + "_" + student.annee_univ;
-        const filename = plus_info.replace(/\s/g, '-').toLowerCase();
-        const data_ = {
-            test: {
-                fullName: student.fullName,
-                image: image(path.join(process.cwd(), 'process', 'canvas', `${template}.png`)),
-                qr_code: '',
-                date,
-                local,
-                signer_primary: signers[0],
-                signer_secondary: signers[1],
-                filiere,
-                cin: student.cin,
-                cne: student.cne,
-                mention: student.mention,
-                titre_diplome,
-                ministere:ministere? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
-                presidence:presidence? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)): null,
-                etablissement:etablissement? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
-                fileName: path.join(process.cwd(), 'uploads', 'certificates', `${filename}` + '.pdf')
-            }
-        };
-        await generateQRCode(filename).then(() => {
-            data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
+
+
+    if (students.length > 0 && signers.length> 0 && titre_diplome!=="" && template!=="" && date!=="" && local!=="" && filiere!=="") {
+        students.forEach(async (student) => {
+            const plus_info = student.fullName + "_" + filiere + "_" + student.annee_univ;
+            const filename = plus_info.replace(/\s/g, '-').toLowerCase();
+            const data_ = {
+                test: {
+                    fullName: student.fullName,
+                    image: image(path.join(process.cwd(), 'process', 'canvas', `${template}.png`)),
+                    qr_code: '',
+                    date,
+                    local,
+                    signer_primary: signers[0],
+                    signer_secondary: signers[1],
+                    filiere,
+                    cin: student.cin,
+                    cne: student.cne,
+                    mention: student.mention,
+                    titre_diplome,
+                    ministere: ministere ? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
+                    presidence: presidence ? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)) : null,
+                    etablissement: etablissement ? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
+                    fileName: path.join(process.cwd(), 'uploads', 'certificates', `${filename}` + '.pdf')
+                }
+            };
+            await generateQRCode(filename).then(() => {
+                data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
+            })
+            const fileName = await process_.generateCertificate(data_);
+            const hash = await process_.hashDocument(data_.test.fileName);
+
         })
-        const fileName = await process_.generateCertificate(data_);
-        const hash = await process_.hashDocument(data_.test.fileName);
 
-    })
+        res.status(200).json({
+            message: "certificates generated successfully",
+        })
+    }
+    else {
+        res.status(400).json({
+            message: "please fill all the fields",
+        })
+    }
 
-    res.status(200).json({  
-        message: "certificates generated successfully",
-        data: students
-    })
-    
 }
 
 
