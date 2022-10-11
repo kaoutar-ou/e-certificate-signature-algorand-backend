@@ -40,15 +40,15 @@ const decryptFilename = (encrypted) => {
 
 const generateQRCode = async (data_) => {
 
-    const infos = data_.split('_');
-    const object = {
-        filename : data_,
-        fullname: infos[0],
-        filiere: infos[1],
-        annee_univ: infos[2],
-    }
-    const encrypted = encryptFilename(JSON.stringify(object));
-    var qr_url = "https://www.uca.ma/verification/" + encrypted;
+    // const infos = data_.split('_');
+    // const object = {
+    //     filename : data_,
+    //     fullname: infos[0],
+    //     filiere: infos[1],
+    //     annee_univ: infos[2],
+    // }
+    const encrypted = encryptFilename(data_);
+    var qr_url = "http://localhost:22840/verification/" + encrypted;
     const opts = {
         errorCorrectionLevel: 'H',
         type: 'terminal',
@@ -66,7 +66,7 @@ const generateQRCode = async (data_) => {
         QRCode.toFile(path.join(FILE_PATH, `${data_}.png`), qr_url, opts, function (err) {
             if (err) reject(err)
             resolve(true)
-            console.log("decrypted", JSON.parse(decryptFilename(encrypted)));
+            console.log("decrypted", decryptFilename(encrypted));
         })
     })
 
@@ -77,15 +77,41 @@ const image = (filename) => {
 }
 
 const generateCertificate = async (req, res) => {
+    console.log("req.signers", req);
     const fullname = req.body.fullName;
+    const date = req.body.date;
+    const local = req.body.local;
+    const signers = req.body.signers;
+    const filiere = req.body.filiere;
+    const cin = req.body.cin;
+    const cne = req.body.cne;
+    const mention = req.body.mention;
+    const titre_diplome = req.body.titre_diplome;
+    const ministere = req.body.ministere;
+    const presidence = req.body.presidence; 
+    const etablissement = req.body.etablissement;
+    const template = req.body.template;
+
     const plus_info = fullname + "_" + req.body.filiere + "_" + req.body.annee_univ;
 
     const filename = plus_info.replace(/\s/g, '-').toLowerCase();
     const data_ = {
         test: {
             fullName: fullname,
-            image: image('certiff.png'),
+            image: image(path.join(process.cwd(), 'process', 'canvas', `${template}.png`)),
             qr_code: '',
+            date,
+            local,
+            signer_primary: signers[0],
+            signer_secondary: signers[1],
+            filiere,
+            cin,
+            cne,
+            mention,
+            titre_diplome,
+            ministere:ministere? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
+            presidence:presidence? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)): null,
+            etablissement:etablissement? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
             fileName: path.join(process.cwd(), 'uploads', 'certificates', `${filename}` + '.pdf')
         }
     };
@@ -94,11 +120,100 @@ const generateCertificate = async (req, res) => {
     })
     const fileName = await process_.generateCertificate(data_);
     const hash = await process_.hashDocument(data_.test.fileName);
-    res.status(200).send({ message: "Certificate generated successfully ! ", hash });
+    
+
+}
+
+const generateForAllStudents = async (req, res) => {
+    const students = req.body.students;
+    const signers = req.body.signers;
+    const date = req.body.date;
+    const local = req.body.local;
+    const filiere = req.body.filiere;
+    const titre_diplome = req.body.titre_diplome;
+    const ministere = req.body.ministere;
+    const presidence = req.body.presidence; 
+    const etablissement = req.body.etablissement;
+    const template = req.body.template;
+
+    students.forEach(async (student) => {
+        const plus_info = student.fullName + "_" + filiere + "_" + student.annee_univ;
+        const filename = plus_info.replace(/\s/g, '-').toLowerCase();
+        const data_ = {
+            test: {
+                fullName: student.fullName,
+                image: image(path.join(process.cwd(), 'process', 'canvas', `${template}.png`)),
+                qr_code: '',
+                date,
+                local,
+                signer_primary: signers[0],
+                signer_secondary: signers[1],
+                filiere,
+                cin: student.cin,
+                cne: student.cne,
+                mention: student.mention,
+                titre_diplome,
+                ministere:ministere? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
+                presidence:presidence? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)): null,
+                etablissement:etablissement? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
+                fileName: path.join(process.cwd(), 'uploads', 'certificates', `${filename}` + '.pdf')
+            }
+        };
+        await generateQRCode(filename).then(() => {
+            data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
+        })
+        const fileName = await process_.generateCertificate(data_);
+        const hash = await process_.hashDocument(data_.test.fileName);
+
+    })
+
+    res.status(200).json({  
+        message: "certificates generated successfully",
+        data: students
+    })
+    
+}
+
+
+const generateCertificateTest = async (req, res) => {
+    const fullname = "Oubenaddi Kaoutar";
+
+
+    const plus_info = fullname + "_test_2021-2022";
+
+    const filename = plus_info.replace(/\s/g, '-').toLowerCase();
+    const data_ = {
+        test: {
+            fullName: fullname,
+            image: image(path.join(process.cwd(), 'process', 'canvas', 'certif_7.png')),
+            qr_code: image(path.join(FILE_PATH, `mouzafir-abdelhadi_irisi_2021-2022.png`)),
+            date: "12/02/2022",
+            local: "Marrakech",
+            signer_primary: { fullname: "Aziz taarabt", position: "Président de l'UCA , au nom du monsieur le président de la part du ministère education supérieur." },
+            signer_secondary: { fullname: "Mouha taourirt", position: "Monsieur le Doyen , de la Faculté des Sciences et Techniques ." },
+            filiere: "Ingeénierie des Réseaux et Systèmes d'Information",
+            cin: "JB45450",
+            cne: "D132748956",
+            mention: "Très bien",
+            titre_diplome: "Ingénieur d'état",
+            ministere: image(path.join(process.cwd(), 'process', 'canvas', 'ministere_2.png')),
+            presidence: image(path.join(process.cwd(), 'process', 'canvas', 'uca.png')),
+            etablissement: image(path.join(process.cwd(), 'process', 'canvas', 'fst.png')),
+            fileName: path.join(process.cwd(), 'uploads', 'certificates', `${filename}` + '.pdf')
+        }
+    };
+    // await generateQRCode(filename).then(() => {
+    //     data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
+    // })
+    const fileName = await process_.generateCertificate(data_);
+    // const hash = await process_.hashDocument(data_.test.fileName);
+    res.status(200).send({ message: "Certificate generated successfully ! " });
 
 }
 
 
 module.exports = {
-    generateCertificate
+    generateCertificate,
+    generateCertificateTest,
+    generateForAllStudents
 }

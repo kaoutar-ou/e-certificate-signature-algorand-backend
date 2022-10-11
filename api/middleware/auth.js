@@ -1,6 +1,9 @@
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
-
+const models = require("../models");
+const User = models.user;
+const Role = models.role;
+const Etudiant = models.etudiant;
 
 const verifyToken = (req, res, next) => {
     let token = req.session.token;
@@ -13,6 +16,7 @@ const verifyToken = (req, res, next) => {
       if (err) {
         return res.status(401).send({ message: "Unauthorized!" });
       }
+      console.log("decoded", decoded);
       req.userId = decoded.id;
       next();
     });
@@ -50,11 +54,13 @@ const verifyToken = (req, res, next) => {
   };
   
   isSuperAdmin = (req, res, next) => {
+    console.log(req.userId);
     User.findById(req.userId).exec((err, user) => {
       if (err) {
         res.status(500).send({ message: err });
         return;
       }
+      console.log("hello");
   
       Role.find(
         {
