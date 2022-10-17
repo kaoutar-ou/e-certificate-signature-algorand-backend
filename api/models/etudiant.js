@@ -11,6 +11,7 @@ const Etudiant = mongoose.model(
         telephone: String,
         ville: String,
         pays: String,
+        visibility: Boolean,
         date_inscription: String,
         date_sort: String,
         // valide: {

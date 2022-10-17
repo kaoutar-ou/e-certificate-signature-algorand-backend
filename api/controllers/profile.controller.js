@@ -71,6 +71,21 @@ const studentProfile = async (req, res) => {
 
 }
 
+const updateProfileVisibility = async (req, res) => {
+{
+    user_id = req.body.user_id;
+    visibility = req.body.visibility;
+    console.log(user_id, visibility);
+
+    const etidinant = await Etudiant.findOne({ user: user_id });
+    etidinant.visibility = visibility;
+    await etidinant.save();
+    res.status(200).json({
+        message: "Profile visibility updated successfully",
+    })
+}}
+
 module.exports = {
-    studentProfile
+    studentProfile,
+    updateProfileVisibility
 }
