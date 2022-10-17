@@ -3,6 +3,11 @@ const process_ = require('../../process');
 const path = require('path');
 const QRCode = require('qrcode');
 const CryptoJS = require("crypto-js");
+const models = require("../models");
+const Certificat = require('../models/certificat');
+const Etudiant = require('../models/etudiant');
+const Filiere = require('../models/filiere');
+
 
 const FILE_PATH = path.join(process.cwd(), 'uploads', 'qr-codes');
 const KEY = '12345678901234567890123456789012';
@@ -40,13 +45,6 @@ const decryptFilename = (encrypted) => {
 
 const generateQRCode = async (data_) => {
 
-    // const infos = data_.split('_');
-    // const object = {
-    //     filename : data_,
-    //     fullname: infos[0],
-    //     filiere: infos[1],
-    //     annee_univ: infos[2],
-    // }
     const encrypted = encryptFilename(data_);
     var qr_url = "http://localhost:22840/verification/" + encrypted;
     const opts = {
@@ -115,6 +113,7 @@ const generateCertificate = async (req, res) => {
             fileName: path.join(process.cwd(), 'uploads', 'certificates', `${filename}` + '.pdf')
         }
     };
+
     await generateQRCode(filename).then(() => {
         data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
     })
@@ -137,10 +136,14 @@ const generateForAllStudents = async (req, res) => {
     const etablissement = req.body.etablissement;
     const template = req.body.template;
 
+    fs.ensureDirSync(path.join(process.cwd(), 'uploads', 'certificates'));
 
+    if (students.length > 0 && signers.length > 0 && titre_diplome !== "" && template !== "" && date !== "" && local !== "" && filiere !== "") {
+        Promise.all(students.map(async (student) => {
 
-    if (students.length > 0 && signers.length> 0 && titre_diplome!=="" && template!=="" && date!=="" && local!=="" && filiere!=="") {
-        Promise.any(students.map(async (student) => {
+            if (!fs.existsSync(student.fullName.replace(/\s/g, '-').toLowerCase())) {
+                fs.mkdirSync(path.join(process.cwd(), 'uploads', 'certificates', student.fullName.replace(/\s/g, '-').toLowerCase()), { recursive: true });
+            }
             const plus_info = student.fullName + "_" + filiere + "_" + student.annee_univ;
             const filename = plus_info.replace(/\s/g, '-').toLowerCase();
             const data_ = {
@@ -160,14 +163,39 @@ const generateForAllStudents = async (req, res) => {
                     ministere: ministere ? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
                     presidence: presidence ? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)) : null,
                     etablissement: etablissement ? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
-                    fileName: path.join(process.cwd(), 'uploads', 'certificates', `${filename}` + '.pdf')
+                    fileName: path.join(process.cwd(), 'uploads', 'certificates', student.fullName.replace(/\s/g, '-').toLowerCase(), `${filename}` + '.pdf'),
+
                 }
             };
             await generateQRCode(filename).then(() => {
                 data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
             })
-            const fileName = await process_.generateCertificate(data_);
+            const fileName = await process_.generateCertificate(data_)
             const hash = await process_.hashDocument(data_.test.fileName);
+
+            const student_ = await Etudiant.findOne({ cne: student.cne });
+            console.log(filiere)
+            const filiere_ = await Filiere.findOne({ abbr: filiere });
+            console.log("student_", student_);
+            console.log("filiere_", filiere_);  
+
+            console.log('hello 1 ')
+            var certificat = new models.certificat({
+                etudiant: student_._id,
+                filiere: filiere_._id,
+                fileName: encryptFilename(filename),
+            });
+            console.log('hello')
+
+            console.log("certificat", certificat);
+
+            const savedCertificat = await certificat.save();
+
+            student_.certificats.push(savedCertificat._id);
+
+            await student_.save();
+
+
         })).then(() => {
 
             res.status(200).json({
@@ -179,8 +207,8 @@ const generateForAllStudents = async (req, res) => {
                 error: err
             })
         })
-      
-       
+
+
     }
     else {
         res.status(400).json({
@@ -227,9 +255,33 @@ const generateCertificateTest = async (req, res) => {
 
 }
 
+const sendFile = async (req, res) => {
+    console.log("🚀 ~ file: process.controller.js ~ line 235 ~ sendFile ~ req", req.query.hash.replace(/\s/g, '+'))
+    const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
+    console.log(filename);
+    const file = path.join(process.cwd(), 'uploads', 'certificates', filename.split('_')[0], `${filename}` + '.pdf');
+    console.log(file);
+    const fileExists = await fs.existsSync(file);
+    if (fileExists) {
+
+        res.header('Content-Type', 'application/pdf');
+        res.header('Content-Disposition', 'attachment; filename=' + filename + '.pdf');
+        // res.sendFile(file);
+        var data = fs.readFileSync(file);
+        res.contentType("application/pdf");
+        res.send(data);
+    }
+    else {
+        res.status(404).json({
+            message: "Certificate not found"
+        })
+    }
+}
+
 
 module.exports = {
     generateCertificate,
     generateCertificateTest,
-    generateForAllStudents
+    generateForAllStudents,
+    sendFile
 }

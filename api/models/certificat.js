@@ -10,7 +10,9 @@ const Certificat = mongoose.model(
         filiere: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Filiere",
-        }
+        },
+        fileName: String,
+        txnHash: String,
     }, { timestamps: true }
     ));
 

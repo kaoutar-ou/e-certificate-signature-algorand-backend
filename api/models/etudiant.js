@@ -6,6 +6,7 @@ const Etudiant = mongoose.model(
         cne: String,
         code_apogee: String,
         address: String,
+        avatar:String,
         date_naissance: String,
         telephone: String,
         ville: String,
