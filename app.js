@@ -10,6 +10,8 @@ const routesUser = require("./api/routes/user");
 const routesBackops = require("./api/routes/backops");
 const routesProcess = require("./api/routes/process");
 const routesUpload = require("./api/routes/upload");
+const routesProfile = require("./api/routes/profile");
+const router = express.Router();
 const { authJwt } = require("./api/middleware");
 
 var corsOptions = {
@@ -54,6 +56,8 @@ app.use(
 );
 
 
+
+
 // ? auth routes
 app.use("/api/auth", routesUser);
 
@@ -70,6 +74,19 @@ app.use("/api/process", routesProcess);
 
 app.use("/api/upload", routesUpload);
 
+// ? profile routes
+
+app.use("/api/profile", routesProfile);
+
+// ? test
+
+  //  filename = __dirname + '/uploads/certificates/mouzafir-abdelhadi_irisi_2022-2023.pdf';
+
+
+  // app.use('/client', express.static(filename));
+  // console.log(filename);
+
+  
 
 // ? ----------------------------------
 
