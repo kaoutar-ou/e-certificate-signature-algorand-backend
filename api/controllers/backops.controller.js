@@ -3,6 +3,7 @@ const AnneeUniversitaire = require("../models/anneeUniversitaire");
 const Certificat = require("../models/certificat");
 const Etablissement = require("../models/etablissement");
 const Etudiant = require("../models/etudiant");
+const Filiere = require("../models/filiere");
 const Module = require("../models/module");
 const Semestre = require("../models/semestre");
 const University = require("../models/university");
@@ -418,6 +419,39 @@ const createModule = async (req, res) => {
 
 }
 
+const getAllCertificatsByFiliere = async (req, res) => {
+    const filiereAbbr = req.params.filiere;
+    const filiere = await Filiere.findOne({ abbr: filiereAbbr.toUpperCase() });
+    if(filiere == null || filiere == undefined) {
+        try {
+            let certificats = await Certificat.find({ filiere: filiere._id })
+                                            .populate("etudiant");
+            res.status(200).send(certificats);
+        } catch (err) {
+            res.status(500).send({ message: err });
+        }
+    } else {
+        res.status(400).send({ message: "Filiere not found" });
+    }
+}
+
+const getCertifiedFilieres = async (req, res) => {
+    let allFilieresIds = await Certificat.find().select("filiere");
+    let filieresIds = [];
+    allFilieresIds.forEach(filiereId => {
+        if(!filieresIds.includes(filiereId)) {
+            filieresIds.push(filiereId);
+        }
+    }
+    );
+    let filieres = [];
+    filieresIds.forEach(async filiereId => {
+        let filiere = await Filiere.findById(filiereId);
+        filieres.push(filiere);
+    });
+    res.status(200).send(filieres);
+}
+
 module.exports = {
     createUniverse,
     createEtablissement,
@@ -426,7 +460,9 @@ module.exports = {
     sendEmailTest,
     getAllEtudiants,
     createSemestre,
-    createModule
+    createModule,
+    getAllCertificatsByFiliere,
+    getCertifiedFilieres,
 }
 
 

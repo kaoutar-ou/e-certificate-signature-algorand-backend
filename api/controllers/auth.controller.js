@@ -29,21 +29,21 @@ const checkAuth = (req, res, err, user) => {
   if (!passwordIsValid) {
     return res.status(401).send({ message: "Invalid Password!" });
   }
-
-  if (user.mac != req.body.mac) {
-    return res.status(401).send({ message: "Invalid Mac Address!" });
+  
+  var authorities = [];
+  
+  for (let i = 0; i < user.roles.length; i++) {
+    authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
   }
-
-  var token = jwt.sign({ id: user.id }, process.env.JWT_KEY, {
+  
+  var token = jwt.sign({ id: user.id, roles: authorities }, process.env.JWT_KEY, {
     expiresIn: 86400, // 24 hours
   });
 
   console.log(token);
 
-  var authorities = [];
-
-  for (let i = 0; i < user.roles.length; i++) {
-    authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
+  if (!authorities.includes('ROLE_ETUDIANT') && user.mac != req.body.mac) {
+    return res.status(401).send({ message: "Invalid Mac Address!" });
   }
 
   req.session.token = token;
