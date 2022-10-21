@@ -125,10 +125,12 @@ const generateForAllStudents = async (req, res) => {
             };
             await generateQRCode(filename).then(() => {
                 data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
-            })
-            const fileName = await process_.generateCertificate(data_)
-            const hash = await process_.hashDocument(data_.test.fileName);
+            });
             
+            await process_.generateCertificate(data_)
+            const hash = await process_.hashDocument(data_.test.fileName);
+            console.log("hash", hash);
+
             const student_ = await Etudiant.findOne({ where: { cne: student.cne } });
 
 
@@ -137,14 +139,16 @@ const generateForAllStudents = async (req, res) => {
             const filiere_ = await Filiere.findOne({ where: { abbr: filiere } });
 
             const certificat = await Certificat.create({
-                etudiant: student_._id,
-                filiere: filiere_._id,
                 fileName: encryptFilename(filename),
             });
 
-    
-            console.log("certificat", certificat);
+            certificat.setEtudiant(student_.id);
+            certificat.setFiliere(filiere_.id);
+          
 
+
+            await student_.addCertificat(certificat);
+            console.log("certificat", certificat);
 
         })).then(() => {
 
