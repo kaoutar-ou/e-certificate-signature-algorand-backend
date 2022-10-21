@@ -1,9 +1,13 @@
 const Role = require("../api/models/role");
 
-const initial=()=> {
+const initial=async ()=> {
 
     // Role.estimatedDocumentCount((err, count) => {
     //   if (!err && count === 0) {
+      const countRoles = await Role.count();
+
+      if (countRoles === 0) {
+      
         new Role({
           name: "etudiant"
         }).save(err => {
@@ -32,6 +36,10 @@ const initial=()=> {
   
           console.log("added 'admin' to roles collection");
         });
+      }
+      else{
+        console.log("roles already exist");
+      }
       // }
     // });
 

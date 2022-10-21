@@ -4,11 +4,11 @@ dotenv.config();
 
 const sequelize = new Sequelize(
     process.env.DB_NAME || "default-certif-db", 
-    process.env.USER || "postgres", 
-    process.env.PASSWORD || "root", 
+    process.env.USER || "root", 
+    process.env.PASSWORD || "", 
     {
         host: process.env.HOST || "localhost",
-        dialect: process.env.DIALECT || "postgres",
+        dialect: process.env.DIALECT || "mysql",
         logging: false,
     }
   );
