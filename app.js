@@ -43,44 +43,6 @@ sequelize.authenticate().then(() => {
     console.error('Unable to connect to the database', error);
 });
 
-app.get("/", async (req, res) => {
-    res.json({ message: "..." });
-    console.log(User === sequelize.models.User); 
-    console.log(Role === sequelize.models.Role);
-    // initial();
-    const role = await Role.findOne({ 
-        where: sequelize.where(sequelize.fn('lower', sequelize.col('name')), 'etudiant')
-     });
-    console.log(role.dataValues);
-
-    const roles = await Role.findAll({ 
-        where: 
-            {
-                name: {
-                    [Sequelize.Op.in]: ['etudiant', 'admin']
-                }
-            }
-        
-    }).then((roles) => {
-        return roles.at(0)
-    });
-    console.log(roles);
-
-    const user = await User.create({
-        username: "user5",
-        email: "useremail5@gmail.com",
-        password: "userpassword",
-        nom: "usernom5",
-        prenom: "userprenom5",
-        cin: "usercin5",
-        mac: "usermac5",
-    });
-
-    user.setRoles([role.dataValues.id]).then(() => {
-        console.log("User was registered successfully!");
-      });
-});
-
 
 // ? auth routes
 app.use("/api/auth", routesUser);
