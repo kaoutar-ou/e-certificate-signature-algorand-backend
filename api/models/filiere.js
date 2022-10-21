@@ -42,4 +42,5 @@ Filiere.belongsTo(Etablissement);
 
 Etablissement.hasMany(Filiere);
 
+
 module.exports = Filiere;

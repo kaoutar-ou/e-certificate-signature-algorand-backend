@@ -10,6 +10,7 @@ const Role = require("./api/models/Role");
 
 const routesUser = require("./api/routes/user");
 const routesBackops = require("./api/routes/backops");
+const routesUpload = require("./api/routes/upload");
 
 dotenv.config();
 
@@ -33,11 +34,11 @@ app.listen(PORT, () => {
 sequelize.authenticate().then(() => {
     console.log('Connected to database');
     // sequelize.sync({ force: true }).then(() => {
-        sequelize.sync({ force: false }).then(() => {
-        console.log('Database synchronized');
-    // initial();
-    }
-    );
+    //     sequelize.sync({ force: false }).then(() => {
+    //     console.log('Database synchronized');
+    // // initial();
+    // }
+    // );
 }).catch((error) => {
     console.error('Unable to connect to the database', error);
 });
@@ -93,9 +94,9 @@ app.use("/api/backops", routesBackops);
 
 // app.use("/api/process", routesProcess);
 
-// // ? upload routes
+// ? upload routes
 
-// app.use("/api/upload", routesUpload);
+app.use("/api/upload", routesUpload);
 
 // // ? profile routes
 

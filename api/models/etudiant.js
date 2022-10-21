@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/db');
 const AnneeUniversitaire = require('./AnneeUniversitaire');
+const Certificat = require('./certificat');
 const User = require('./User');
 
 const Etudiant = sequelize.define('Etudiant', {
@@ -55,6 +56,9 @@ const Etudiant = sequelize.define('Etudiant', {
     tableName: 'etudiants',
     timestamps: true,
 });
+
+Etudiant.hasMany(Certificat);
+Certificat.belongsTo(Etudiant);
 
 
 module.exports = Etudiant;
