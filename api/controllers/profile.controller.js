@@ -45,6 +45,8 @@ const studentProfile = async (req, res) => {
 
     const student = await Etudiant.findOne(obj).populate('user');
     const certificats = await Certificat.find({ etudiant: student._id }).populate('filiere');
+    if(certificats.length > 0){
+
     const filiere = await Filiere.findOne({ _id: certificats[0].filiere }).populate('etablissement');
     const university = await University.findOne({ _id: filiere.etablissement.universite });
     let certificatsInfo = [];
@@ -53,6 +55,18 @@ const studentProfile = async (req, res) => {
         certificatsInfo.push(new CertificatsInfo(certificat));
     });
 
+    res.status(200).json({
+        student,
+        certificatsInfo,
+        university,
+    })
+}
+
+else {
+    res.status(200).json({
+        student,
+    })
+}
     // const fullname = student.user.nom + "-" + student.user.prenom;
     // const dirPath = path.join(process.cwd(), 'uploads', 'certificates', `${fullname}`);
     // const files = fs.readdirSync(dirPath);
@@ -63,11 +77,11 @@ const studentProfile = async (req, res) => {
     // })
 
     
-    res.status(200).json({
-        student,
-        certificatsInfo,
-        university,
-    })
+    // res.status(200).json({
+    //     student,
+    //     certificatsInfo,
+    //     university,
+    // })
 
 }
 

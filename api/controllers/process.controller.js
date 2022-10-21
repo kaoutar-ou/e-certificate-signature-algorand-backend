@@ -256,6 +256,7 @@ const generateCertificateTest = async (req, res) => {
 }
 
 const sendFile = async (req, res) => {
+    console.log("sendFile");
     console.log("🚀 ~ file: process.controller.js ~ line 235 ~ sendFile ~ req", req.query.hash.replace(/\s/g, '+'))
     const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
     console.log(filename);

@@ -25,12 +25,14 @@ const checkAuth = (req, res, err, user) => {
     req.body.password,
     user.password
   );
+  console.log(passwordIsValid);
 
   if (!passwordIsValid) {
     return res.status(401).send({ message: "Invalid Password!" });
   }
   
   var authorities = [];
+  var etudiant;
   
   for (let i = 0; i < user.roles.length; i++) {
     authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
@@ -43,18 +45,50 @@ const checkAuth = (req, res, err, user) => {
   console.log(token);
 
   if (!authorities.includes('ROLE_ETUDIANT') && user.mac != req.body.mac) {
+    etudiant = null;
     return res.status(401).send({ message: "Invalid Mac Address!" });
   }
+  else {
+    Etudiant.findOne({ user: user._id })
+      .populate("filiere", "-__v")
+      .populate("user", "-__v")
+      .exec((err, etudiant) => {
+        if (err) {
+          res.status(500).send({ message: err });
+          return;
+        }
+        req.session.token = token;
+        if (etudiant) {
+          res.status(200).send({
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            roles: authorities,
+            accessToken: token,
+            etudiant: etudiant,
+          });
+        }
+        else {
+          res.status(200).send({
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            roles: authorities,
+            accessToken: token,
+          });
+        }
+      });
+  }
 
-  req.session.token = token;
+  // req.session.token = token;
 
-  res.status(200).send({
-    id: user._id,
-    username: user.username,
-    email: user.email,
-    roles: authorities,
-    accessToken: token,
-  });
+  // res.status(200).send({
+  //   id: user._id,
+  //   username: user.username,
+  //   email: user.email,
+  //   roles: authorities,
+  //   accessToken: token,
+  // });
 }
 
 const signin = (req, res) => {
