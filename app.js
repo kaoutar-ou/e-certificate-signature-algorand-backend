@@ -56,7 +56,7 @@ app.get("/", async (req, res) => {
         where: 
             {
                 name: {
-                    [Sequelize.Op.in]: ['etudiant', 'admin']
+                    [Sequelize.Op.in]: ['super_admin', 'admin']
                 }
             }
         
@@ -67,7 +67,7 @@ app.get("/", async (req, res) => {
 
     const user = await User.create({
         username: "user5",
-        email: "useremail5@gmail.com",
+        email: "useremail6@gmail.com",
         password: "userpassword",
         nom: "usernom5",
         prenom: "userprenom5",

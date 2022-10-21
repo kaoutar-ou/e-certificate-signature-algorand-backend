@@ -1,5 +1,7 @@
 const Role = require("../models/Role");
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const Sequelize = require("sequelize");
 const { verifyNewUserRequest, generateUsername, generatePassword, generateEmail, userExists, getNewAnneeUniversitaire, verifyNewEtudiantRequest } = require("../utils/user");
 const Etudiant = require("../models/Etudiant");
@@ -109,8 +111,86 @@ const signup = async (req, res) => {
 
 
 
+const checkAuth = async(req, res  , user) => {
+   
+    if (!user) {
+        res.status(404).send({ message: "User Not found." });
+        return;
+    }
 
+    var passwordIsValid = bcrypt.compareSync(
+        req.body.password,
+        user.password
+    );
 
+    if (!passwordIsValid) {
+        return res.status(401).send({
+        message: "Invalid Password!"
+        });
+    }
+
+    var authorities = [];
+    const roles = await user.getRoles();
+   
+    for (let i = 0; i < roles.length; i++) {
+        authorities.push("ROLE_" + roles[i].dataValues.name.toUpperCase());
+    }
+    
+
+    var token = jwt.sign({ id: user.id , roles:authorities }, process.env.JWT_KEY, {
+        expiresIn: 86400 // 24 hours
+    });
+
+    console.log("token", token);
+
+    if(authorities.includes("ROLE_ETUDIANT")) {
+        Etudiant.findOne({ where: { user_id: user.id } }).then((etudiant) => {
+            res.status(200).send({
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                roles: authorities,
+                accessToken: token,
+                etudiant: etudiant
+            });
+        })
+    }
+    else {
+        res.status(200).send({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            roles: authorities,
+            accessToken: token
+        });
+    }
+
+}
+
+const signin = (req, res) => {
+    if(req.body.username.includes("@")){
+        User.findOne({
+            where: {
+                email: req.body.username
+            }
+        }).then(async(user) => {
+            await checkAuth(req, res, user);
+        }).catch(err => {
+            res.status(500).send({ message: err.message });
+        });
+    }
+    else {
+        User.findOne({
+            where: {
+                username: req.body.username
+            }
+        }).then(async(user) => {
+            await checkAuth(req, res, user);
+        }).catch(err => {
+            res.status(500).send({ message: err.message });
+        });
+    }
+}
 
   const createEtudiant = async (req, res, user_id) => {
 
@@ -196,4 +276,5 @@ const signup = async (req, res) => {
 
   module.exports = {
     signup,
+    signin,
     };
