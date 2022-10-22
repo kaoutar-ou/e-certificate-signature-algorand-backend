@@ -24,7 +24,8 @@ Etudiant.hasMany(AnneeUniversitaire);
 // Etudiant.belongsToMany(Filiere, { through: AnneeUniversitaire });
 // Filiere.belongsToMany(Etudiant, { through: AnneeUniversitaire });
 
-AnneeUniversitaire.hasOne(Etudiant);
-AnneeUniversitaire.hasOne(Filiere);
+AnneeUniversitaire.belongsTo(Etudiant);
+AnneeUniversitaire.belongsTo(Filiere);
+Etudiant.hasMany(AnneeUniversitaire);
 
 module.exports = AnneeUniversitaire;
