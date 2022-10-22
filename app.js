@@ -55,7 +55,7 @@ app.use((req, res, next) => {
   
 sequelize.authenticate().then(() => {
     console.log('Connected to database');
-    sequelize.sync({ force: false }).then(() => {
+    sequelize.sync({ force: true }).then(() => {
         // sequelize.sync({ force: false }).then(() => {
         console.log('Database synchronized');
     initial();

@@ -238,6 +238,8 @@ const createEtudiant = async (req, res, user_id) => {
                     etudiant = await Etudiant.create(etudiant);
 
                     etudiant.setUser(user_id);
+                    console.log("🚀 ~ file: auth.controller.js ~ line 241 ~ createEtudiant ~ user_id", user_id)
+                
 
                     anneeUniversitaire = {
                         annee: getNewAnneeUniversitaire(),
@@ -270,7 +272,7 @@ const createEtudiant = async (req, res, user_id) => {
                 console.log(error);
                 return {
                     status: 500,
-                    message: "Internal server error"    
+                    message: "Internal server error 1"    
                 };
             }
         } else {
