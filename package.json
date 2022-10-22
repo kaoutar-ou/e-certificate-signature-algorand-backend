@@ -30,6 +30,7 @@
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
     "qrcode": "^1.5.1",
+    "puppeteer": "^18.2.0",
     "read-excel-file": "^5.5.2",
     "sequelize": "^6.25.2",
     "xlsx": "^0.18.5"

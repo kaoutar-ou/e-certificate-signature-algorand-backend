@@ -5,8 +5,12 @@ const {verifyToken,isSuperAdmin,isAdmin} = require("../middlwares/auth");
 const {signup,signin} = require("../controllers/auth.controller");
 router.post("/login", signin);
 // router.post("/register-student",[verifyToken,isAdmin], signup);
-router.post("/register-student",[verifyToken,isAdmin], signup);
+router.post("/register-student", signup);
 // router.post("/register-admin",[verifyToken,isSuperAdmin], signup);
-router.post("/register-admin",[verifyToken,isSuperAdmin], signup);
+router.post("/register-admin", signup);
+
+router.get("/test", (req, res) => {
+    res.send({ message: "Welcome to test application." });
+});
 
 module.exports = router;

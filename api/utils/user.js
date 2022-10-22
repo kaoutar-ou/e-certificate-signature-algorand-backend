@@ -35,7 +35,7 @@ const generatePassword = (length) => {
     return year+"/"+(year+1)
     }
 
-    const verifyNewUserRequest = (request) => {
+    const   verifyNewUserRequest = (request) => {
       if (request.nom && request.prenom && request.cin && request.roles) {
         return true;
       }

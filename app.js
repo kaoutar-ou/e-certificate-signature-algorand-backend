@@ -7,6 +7,7 @@ const Sequelize = require("sequelize");
 const initial = require("./init");
 const User = require("./api/models/User");
 const Role = require("./api/models/Role");
+const routesProcess = require("./api/routes/process");
 const routesUser = require("./api/routes/user");
 const routesBackops = require("./api/routes/backops");
 const routesUpload = require("./api/routes/upload");
@@ -25,7 +26,7 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-const PORT = process.env.PORT || 7001;
+const PORT =  process.env.PORT || 7001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
@@ -54,15 +55,37 @@ app.use((req, res, next) => {
   
 sequelize.authenticate().then(() => {
     console.log('Connected to database');
-    // sequelize.sync({ force: true }).then(() => {
-    //     sequelize.sync({ force: false }).then(() => {
-    //     console.log('Database synchronized');
-    // // initial();
-    // }
-    // );
+    sequelize.sync({ force: false }).then(() => {
+        // sequelize.sync({ force: false }).then(() => {
+        console.log('Database synchronized');
+    initial();
+    }
+    );
 }).catch((error) => {
     console.error('Unable to connect to the database', error);
 });
+
+
+
+// ? auth routes
+app.use("/api/auth", routesUser);
+
+
+// ? backops routes
+
+app.use("/api/backops", routesBackops);
+
+// ? process routes
+
+app.use("/api/process", routesProcess);
+
+// ? upload routes
+
+app.use("/api/upload", routesUpload);
+
+// // ? profile routes
+
+// app.use("/api/profile", routesProfile);
 
 app.use((req, res, next) => {
     const error = new Error("Not found ");
@@ -76,23 +99,3 @@ app.use((req, res, next) => {
       },
     });
   });
-
-// ? auth routes
-app.use("/api/auth", routesUser);
-
-
-// ? backops routes
-
-app.use("/api/backops", routesBackops);
-
-// // ? process routes
-
-// app.use("/api/process", routesProcess);
-
-// ? upload routes
-
-app.use("/api/upload", routesUpload);
-
-// // ? profile routes
-
-// app.use("/api/profile", routesProfile);
