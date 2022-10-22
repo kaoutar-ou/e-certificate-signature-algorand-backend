@@ -66,7 +66,6 @@ sequelize.authenticate().then(() => {
 });
 
 
-
 // ? auth routes
 app.use("/api/auth", routesUser);
 
