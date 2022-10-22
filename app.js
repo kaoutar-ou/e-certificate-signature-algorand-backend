@@ -55,27 +55,27 @@ app.use((req, res, next) => {
 sequelize.authenticate().then(() => {
     console.log('Connected to database');
     // sequelize.sync({ force: true }).then(() => {
-        // sequelize.sync({ force: false }).then(() => {
-    //     console.log('Database synchronized');
-    // initial();
-    // }
-    // );
+        sequelize.sync({ force: false }).then(() => {
+        console.log('Database synchronized');
+    initial();
+    }
+    );
 }).catch((error) => {
     console.error('Unable to connect to the database', error);
 });
 
-app.use((req, res, next) => {
-    const error = new Error("Not found ");
-    error.status = 404;
-    next(error);
-  });
-  app.use((error, req, res, next) => {
-    res.status(error.status || 500).json({
-      error: {
-        message: error.message,
-      },
-    });
-  });
+// app.use((req, res, next) => {
+//     const error = new Error("Not found ");
+//     error.status = 404;
+//     next(error);
+//   });
+//   app.use((error, req, res, next) => {
+//     res.status(error.status || 500).json({
+//       error: {
+//         message: error.message,
+//       },
+//     });
+//   });
 
 // ? auth routes
 app.use("/api/auth", routesUser);

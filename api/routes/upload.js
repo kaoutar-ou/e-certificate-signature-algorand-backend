@@ -1,6 +1,6 @@
 const express = require("express");
 const { uploadExcelEtudiant, uploadExcelNotes } = require("../controllers/upload.controller");
-const { uploadExcelFile } = require("../middleware/upload");
+const { uploadExcelFile } = require("../middlwares/upload");
 const router = express.Router();
 
 router.post("/etudiant-excel", uploadExcelFile.single("file"), uploadExcelEtudiant);

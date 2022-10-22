@@ -255,6 +255,7 @@ const uploadExcelNotes = async (req, res) => {
   });
   let filiereID = filiere?.dataValues?.id ? filiere.dataValues.id : null;
 
+  console.log(filiereID);
   let totalRows = 0;
   let noteRow
 
@@ -274,8 +275,10 @@ const uploadExcelNotes = async (req, res) => {
         data.map(async (row) => {
             if(excelNoteMissingRowValuesCheck(row)) {
                 if (filiereID == null || filiereAbbr == row.filiere.toUpperCase()) {
+                    // console.log("filiereID"+filiereID);
                     filiereAbbr = row.filiere.toUpperCase();
                     if (filiereID == null) {
+                        // console.log("filiereIDNull"+filiereID);
                       filiere = await Filiere.findOne({
                         where: sequelize.where(
                           sequelize.fn("lower", sequelize.col("abbr")),
@@ -286,8 +289,13 @@ const uploadExcelNotes = async (req, res) => {
                         ? filiere.dataValues.id
                         : null;
                     }
+                    
+                    // console.log("filiere.dataValues");
+                    // console.log(filiere.dataValues.id);
+                    // console.log(filiereID);
         
-                    if ((filiereID = !null)) {
+                    if (filiereID != null) {
+                        // console.log("filiereID2"+filiereID);
                         let etudiant = null;
                         etudiant = await Etudiant.findOne({
                             where: {
@@ -296,6 +304,7 @@ const uploadExcelNotes = async (req, res) => {
                         });
 
                         if (etudiant != null && etudiant != undefined) {
+                            console.log("etudiant" + filiereID);
                             let anneeUniversitaire = null;
                             anneeUniversitaire = await AnneeUniversitaire.findOne({
                                 where: {
@@ -306,15 +315,18 @@ const uploadExcelNotes = async (req, res) => {
                             });
 
                             if (anneeUniversitaire == null || anneeUniversitaire == undefined) {
-                                anneeUniversitaire = AnneeUniversitaire.create({
+                                anneeUniversitaire = await AnneeUniversitaire.create({
                                     annee: row.annee_universitaire,
-                                    EtudiantId: etudiant.dataValues.id,
-                                    FiliereId: filiereID,
+                                    // EtudiantId: etudiant.dataValues.id,
+                                    // FiliereId: filiereID,
                                 });
                                 etudiant.addAnneeUniversitaire(anneeUniversitaire.id);
                                 anneeUniversitaire.setEtudiant(etudiant.dataValues.id);
+                                anneeUniversitaire.setFiliere(filiereID);
                             }
 
+                            // console.log("filiereID")
+                            // console.log(filiereID)
                             noteRow = await getNoteRow(row, filiereID);
                 
                         }

@@ -2,6 +2,9 @@ const fs = require("fs");
 const ElementDeNote = require("../models/ElementDeNote");
 const Filiere = require("../models/Filiere");
 
+const Sequelize = require("sequelize");
+const sequelize = require("../../config/db");
+
 const excelEtudiantMissingRowNamesCheck = (row) => {
   const rowNames = [
     "cne",
@@ -135,22 +138,18 @@ const getNoteRow = async (row, filiereID) => {
       let elementDeNote = null;
       let filiere = null;
       if (!excludedRowNames.includes(rowName)) {
-        filiere = await Filiere.findOne({
-          where: {
-            id: filiereID,
-          },
-        });
+        filiere = await Filiere.findByPk(filiereID);
         if (filiere != null && filiere != undefined) {
           elementDeNote = null;
           elementDeNote = await ElementDeNote.findOne(
-            sequelize.fn("lower", sequelize.col("nom")),
-            sequelize.fn("lower", rowName)
+            {
+                where: sequelize.where(
+                    sequelize.fn("lower", sequelize.col("nom")),
+                    sequelize.fn("lower", rowName)
+                ),
+            }
           );
           if (elementDeNote != null && elementDeNote != undefined) {
-            semestre = await Semestre.findOne({
-              _id: module.semestre,
-              filiere: filiereID,
-            });
             noteRow[elementDeNote.dataValues.id] = row[rowName];
           }
         }
