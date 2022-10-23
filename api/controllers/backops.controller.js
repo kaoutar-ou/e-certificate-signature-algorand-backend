@@ -418,53 +418,6 @@ const getAllEtudiants = async (req, res) => {
 
     etudiants.count = etudiants.rows.length;
 
-    // const etudiants = await Etudiant.findAndCountAll({
-    //     where: where,
-    //     include: [
-    //         {
-    //             model: User,
-    //             as: "User",
-    //         },
-    //         {
-    //             model: AnneeUniversitaire,
-    //             as: "AnneeUniversitaires",
-    //             where: {
-    //                 annee: annee,
-    //             }
-    //         },
-    //         {
-    //             model: Note,
-    //             as: "Notes",
-    //             include: [
-    //                 {
-    //                     model: ElementDeNote,
-    //                     as: "ElementDeNote",
-    //                     include: [
-    //                         {
-    //                             model: Filiere,
-    //                             as: "Filiere",
-    //                             include: [
-    //                                 {
-    //                                     model: Etablissement,
-    //                                     as: "Etablissement",
-    //                                     include: [
-    //                                         {
-    //                                             model: University,
-    //                                             as: "University",
-    //                                         }
-    //                                     ]
-    //                                 }
-    //                             ]
-    //                         }
-    //                     ]
-    //                 }
-    //             ]
-    //         }
-    //     ],
-    //     limit: size,
-    //     offset: page * size,
-    // });
-
     res.status(200).send({
         message: "Etudiants fetched successfully",
         etudiants,
