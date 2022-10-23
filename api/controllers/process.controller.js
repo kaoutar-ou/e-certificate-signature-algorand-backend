@@ -281,12 +281,10 @@ const generateCertificate = async (req, res) => {
 }
 
 const sendFile = async (req, res) => {
-    console.log("sendFile");
-    console.log("🚀 ~ file: process.controller.js ~ line 235 ~ sendFile ~ req", req.query.hash.replace(/\s/g, '+'))
+    
     const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
-    console.log(filename);
     const file = path.join(process.cwd(), 'uploads', 'certificates', filename.split('_')[0], `${filename}` + '.pdf');
-    console.log(file);
+   
     const fileExists = await fs.existsSync(file);
     if (fileExists) {
 
@@ -303,6 +301,8 @@ const sendFile = async (req, res) => {
         })
     }
 }
+
+
 
 
 module.exports = {

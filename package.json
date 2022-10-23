@@ -17,6 +17,7 @@
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
     "fs-extra": "^10.1.0",
     "getmac": "^5.20.0",
     "handlebars": "^4.7.7",
