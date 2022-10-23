@@ -3,10 +3,10 @@ const process_ = require('../../process');
 const path = require('path');
 const QRCode = require('qrcode');
 const CryptoJS = require("crypto-js");
-const models = require("../models");
-const Certificat = require('../models/certificat');
-const Etudiant = require('../models/etudiant');
-const Filiere = require('../models/filiere');
+// const models = require("../models");
+const Certificat = require('../models/Certificat');
+const Etudiant = require('../models/Etudiant');
+const Filiere = require('../models/Filiere');
 
 
 const FILE_PATH = path.join(process.cwd(), 'uploads', 'qr-codes');

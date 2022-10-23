@@ -4,12 +4,12 @@ const path = require('path');
 const Etudiant = require("../models/Etudiant");
 const User = require("../models/User");
 const Filiere = require("../models/Filiere");
-const Certificat = require("../models/certificat");
+const Certificat = require("../models/Certificat");
 const University = require("../models/University");
 const Etablissement = require("../models/Etablissement");
 const CertificateDto = require("../dtos/Certificate.dto")
-const models = require("../models");
-const { certificat } = require('../models');
+// const models = require("../models");
+// const { certificat } = require('../models');
 
 
 const studentProfile = async (req, res) => {
