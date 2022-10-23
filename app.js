@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const cookieSession = require("cookie-session");
+const fileUpload = require('express-fileupload');
 const sequelize = require("./config/db");
 const Sequelize = require("sequelize");
 const initial = require("./init");
@@ -67,20 +68,8 @@ sequelize.authenticate().then(() => {
     console.error('Unable to connect to the database', error);
 });
 
-// app.use((req, res, next) => {
-//     const error = new Error("Not found ");
-//     error.status = 404;
-//     next(error);
-//   });
-//   app.use((error, req, res, next) => {
-//     res.status(error.status || 500).json({
-//       error: {
-//         message: error.message,
-//       },
-//     });
-//   });
-
 // ? auth routes
+app.use(fileUpload());
 app.use("/api/auth", routesUser);
 
 
@@ -99,3 +88,18 @@ app.use("/api/upload", routesUpload);
 // ? profile routes
 
 app.use("/api/profile", routesProfile);
+
+
+
+app.use((req, res, next) => {
+    const error = new Error("Not found ");
+    error.status = 404;
+    next(error);
+  });
+  app.use((error, req, res, next) => {
+    res.status(error.status || 500).json({
+      error: {
+        message: error.message,
+      },
+    });
+  });

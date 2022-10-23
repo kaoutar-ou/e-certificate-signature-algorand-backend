@@ -34,7 +34,8 @@ const studentProfile = async (req, res) => {
         await profile(req, res, student);
     }
     else {
-        res.status(404).json({
+        res.status(200).json({
+            student : {visibility : student.dataValues.visibility},
             message: "Student not found or has a private profile"
         })
     }
@@ -64,6 +65,59 @@ const studentPrivateProfile = async (req, res) => {
             message: "Unauthorized"
         })
     }
+}
+
+const uploadProfileImage = async (req, res) => {
+
+    
+    fs.ensureDirSync(path.join(process.cwd(), 'uploads', 'avatars'));
+    const maxSize = 8 * 1024 * 1024;
+
+    if (!req.files.file) {
+        return res.status(400).send('No files were uploaded.');
+    }
+
+
+    if (req.files.file > maxSize) {
+        return res.status(400).send('File too large');
+    }
+
+
+    const avatar = req.files.file.name.split('.')[0] + '-' + Date.now() +'.'+req.files.file.name.split('.').pop();
+    const filename = path.join(process.cwd(), 'uploads', 'avatars', avatar);
+    console.log(filename);
+    const file = req.files.file;
+    console.log("🚀 ~ file: auth.controller.js ~ line 319 ~ uploadProfileImage ~ file", file)
+
+    file.mv(filename, async (err) => {
+        if (err) {
+            return res.status(500).send(err);
+        }})
+
+    const user = await User.findOne({ where: { id: req.query.id } });
+    if (user) {
+        await Etudiant.findOne({ where: { UserId: user.id } }).then((etudiant) => {
+
+            if(etudiant.avatar){
+                const oldAvatar = path.join(process.cwd(), 'uploads', 'avatars', etudiant.avatar);
+                fs.existsSync(oldAvatar) && fs.unlinkSync(oldAvatar);
+            }
+            
+            etudiant.update({ avatar });
+           
+            res.status(200).send({
+                avatar: avatar,
+                message: "avatar uploaded successfully"
+            });
+        });
+    }
+    else {
+        res.status(404).send({
+            message: "User not found!"
+        });
+    }
+
+
 }
 
 
@@ -129,10 +183,34 @@ const updateProfileVisibility = async (req, res) => {
 }
 
 
+const downloadAvatar = async (req, res) => {
+    
+    
+    const file = path.join(process.cwd(), 'uploads', 'avatars', req.query.avatar);
+    console.log("🚀 ~ file: profile.controller.js ~ line 100 ~ downloadAvatar ~ file", file)
+   
+    const fileExists = await fs.existsSync(file);
+    if (fileExists) {
+
+        res.header('Content-Type', 'image/jpeg', 'image/png', 'image/jpg');
+        res.sendFile(file);
+        // var data = fs.readFileSync(file);
+        // res.send(data);
+    }
+    else {
+        res.status(404).json({
+            message: "avatar not found"
+        })
+    }
+}
+
+
 
 module.exports = {
     studentProfile,
     updateProfileVisibility,
-    studentPrivateProfile
+    studentPrivateProfile,
+    uploadProfileImage,
+    downloadAvatar
 }
 

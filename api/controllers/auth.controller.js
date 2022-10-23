@@ -8,6 +8,9 @@ const Etudiant = require("../models/Etudiant");
 const Filiere = require("../models/Filiere");
 const sequelize = require("../../config/db");
 const AnneeUniversitaire = require("../models/AnneeUniversitaire");
+const fs = require('fs-extra');
+const path = require('path');
+
 
 const signup = async (req, res) => {
 
@@ -144,7 +147,13 @@ const checkAuth = async (req, res, user) => {
     console.log("token", token);
 
     if (authorities.includes("ROLE_ETUDIANT")) {
-        Etudiant.findOne({ where: { UserId: user.id } }).then((etudiant) => {
+        Etudiant.findOne({ where: { UserId: user.id }, include: [{ model: User, as: 'User' }] }).then((etudiant) => {
+
+            const user = etudiant.User.dataValues;
+            const student = etudiant.dataValues;
+            delete student.User;
+            student.user = user;
+
             req.session.token = token;
             res.status(200).send({
                 id: user.id,
@@ -152,10 +161,10 @@ const checkAuth = async (req, res, user) => {
                 email: user.email,
                 roles: authorities,
                 accessToken: token,
-                etudiant: etudiant.dataValues
+                student
             });
         })
-       
+
     }
     else {
 
@@ -170,7 +179,7 @@ const checkAuth = async (req, res, user) => {
                     accessToken: token
                 });
             }
-            
+
         }
         else {
             res.status(401).send({
@@ -239,7 +248,7 @@ const createEtudiant = async (req, res, user_id) => {
 
                     etudiant.setUser(user_id);
                     console.log("🚀 ~ file: auth.controller.js ~ line 241 ~ createEtudiant ~ user_id", user_id)
-                
+
 
                     anneeUniversitaire = {
                         annee: getNewAnneeUniversitaire(),
@@ -272,7 +281,7 @@ const createEtudiant = async (req, res, user_id) => {
                 console.log(error);
                 return {
                     status: 500,
-                    message: "Internal server error 1"    
+                    message: "Internal server error 1"
                 };
             }
         } else {
@@ -291,7 +300,10 @@ const createEtudiant = async (req, res, user_id) => {
 
 
 
+
+
+
 module.exports = {
     signup,
-    signin,
+    signin
 };
