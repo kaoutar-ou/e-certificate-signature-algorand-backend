@@ -31,50 +31,7 @@ const studentProfile = async (req, res) => {
     if (student && student.dataValues.visibility) {
         // const user = await User.findOne({ where: { id: student.user_id } });
         // student.user = user;
-
-        const certificates = await Certificat.findAll({ where: { EtudiantId: student.dataValues.id }, include: [{ model: Filiere, as: 'Filiere' }] });
-        console.log("certificates", certificates);
-
-
-        if (certificates.length > 0) {
-
-            // const filiere = await Filiere.findOne({ where: { id: certificates[0].filiere_id } });
-            const etablissement = await Etablissement.findOne({ where: { id: certificates[0].dataValues.Filiere.dataValues.EtablissementId } });
-            console.log("🚀 ~ file: profile.controller.js ~ line 44 ~ studentProfile ~ etablissement", etablissement)
-
-            const university_ = await University.findOne({ where: { id: etablissement.dataValues.UniversityId } });
-            console.log("🚀 ~ file: profile.controller.js ~ line 47 ~ studentProfile ~ university", university_)
-
-            let certificatsInfo = [];
-
-
-
-            Promise.all(certificates.map(async (certificate) => {
-
-                certificate.dataValues.filiere = (await Filiere.findOne({ where: { id: certificate.dataValues.FiliereId } })).dataValues;
-                delete certificate.dataValues.Filiere;
-                console.log("🚀 ~ file: profile.controller.js ~ line 56 ~ certificates.forEach ~ certificate", certificate.dataValues)
-                certificatsInfo.push(new CertificateDto(certificate.dataValues));
-            }
-            )).then(() => {
-
-                const university = university_.dataValues;
-                res.status(200).json({
-                    student,
-                    certificatsInfo,
-                    university,
-                })
-            })
-
-        }
-        else {
-            res.status(200).json(
-                student,
-            );
-        }
-
-
-
+        await profile(req, res, student);
     }
     else {
         res.status(404).json({
@@ -84,6 +41,7 @@ const studentProfile = async (req, res) => {
 }
 
 const studentPrivateProfile = async (req, res) => {
+    console.log("req.query", req.query.user_id);
     const findByCne = { where: { cne: req.query.cne }, include: [{ model: User, as: 'User' }] };
     const findByCodeApogee = { where: { code_apogee: req.query.cd_apg }, include: [{ model: User, as: 'User' }] };
 
@@ -95,14 +53,21 @@ const studentPrivateProfile = async (req, res) => {
     }
 
     const student = await Etudiant.findOne(obj);
+    console.log("🚀 ~ file: profile.controller.js ~ line 56 ~ studentPrivateProfile ~ student", student.dataValues.User.dataValues.id)
+    
 
-    if (student && student.dataValues.User.id === req.query.user_id) { 
+    if (student && student.dataValues.User.dataValues.id == req.query.user_id) {
         await profile(req, res, student);
+    }
+    else {  
+        res.status(401).json({
+            message: "Unauthorized"
+        })
     }
 }
 
 
-const profile = async (req, res,student) => {
+const profile = async (req, res, student) => {
     const certificates = await Certificat.findAll({ where: { EtudiantId: student.dataValues.id }, include: [{ model: Filiere, as: 'Filiere' }] });
     console.log("certificates", certificates);
 
@@ -146,8 +111,8 @@ const profile = async (req, res,student) => {
 }
 
 
-    
-        
+
+
 
 
 const updateProfileVisibility = async (req, res) => {
