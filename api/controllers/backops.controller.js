@@ -9,6 +9,8 @@ const AnneeUniversitaire = require("../models/AnneeUniversitaire");
 const sequelize = require("../../config/db");
 const { Op } = require("sequelize");
 const Sequelize = require("sequelize");
+const ElementDeNote = require("../models/ElementDeNote");
+const Note = require("../models/Note");
 
 const createUniversity = async (req, res) => {
     let university = {
@@ -130,9 +132,44 @@ const createFiliere = async (req, res) => {
     }
 }
 
-
-    module.exports = {
-        createUniversity,
-        createEtablissement,
-        createFiliere
+const createElementDeNote = async (req, res) => {
+    const filiereAbbr = req.body.filiere;
+    let filiere = await Filiere.findOne({
+        where: sequelize.where(sequelize.fn('lower', sequelize.col('abbr')), sequelize.fn('lower', filiereAbbr))
+    });
+    if(filiere != null && filiere != undefined) {
+        let elementDeNote = {
+            nom: req.body.nom,
+            description: req.body.description,
+        };
+        elementDeNote = await ElementDeNote.create(elementDeNote);
+        elementDeNote.setFiliere(filiere);
+        res.status(200).send({
+            message: "Element de note created successfully",
+            data: elementDeNote,
+        });
     }
+    else {
+        res.status(500).send({
+            message: "No filiere found",
+        });
+    }
+}
+
+const getAllEtudiants = async (req, res) => {
+    // let etudiants = await Etudiant.findAll({include: [{model: User, as: "User"}, {model: AnneeUniversitaire, as: "AnneeUniversitaires"}, {model: Note, as: "Notes", include: [{model: ElementDeNote, as: "ElementDeNote", include: [{model: Filiere, as: "Filiere", include: [{model: Etablissement, as: "Etablissement", include: [{model: University, as: "University"}]}]}]}]}]});
+    let etudiants = await Etudiant.findAll({include: [{model: User, as: "User"}, {model: AnneeUniversitaire, as: "AnneeUniversitaires"}, {model: Note, as: "Notes", include: [{model: ElementDeNote, as: "ElementDeNote", include: [{model: Filiere, as: "Filiere", include: [{model: Etablissement, as: "Etablissement", include: [{model: University, as: "University"}]}]}]}]}]});
+    console.log(etudiants);
+    res.status(200).send({
+        message: "Etudiants fetched successfully",
+        data: etudiants,
+    });
+}
+
+module.exports = {
+    createUniversity,
+    createEtablissement,
+    createFiliere,
+    createElementDeNote,
+    getAllEtudiants
+}

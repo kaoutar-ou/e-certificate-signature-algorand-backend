@@ -145,6 +145,7 @@ const checkAuth = async (req, res, user) => {
 
     if (authorities.includes("ROLE_ETUDIANT")) {
         Etudiant.findOne({ where: { user_id: user.id } }).then((etudiant) => {
+            req.session.token = token;
             res.status(200).send({
                 id: user.id,
                 username: user.username,
@@ -154,11 +155,13 @@ const checkAuth = async (req, res, user) => {
                 etudiant: etudiant
             });
         })
+       
     }
     else {
 
-        if (red.body.mac && user.mac) {
+        if (req.body.mac && user.mac) {
             if (user.mac == req.body.mac) {
+                req.session.token = token;
                 res.status(200).send({
                     id: user.id,
                     username: user.username,
@@ -167,6 +170,7 @@ const checkAuth = async (req, res, user) => {
                     accessToken: token
                 });
             }
+            
         }
         else {
             res.status(401).send({
@@ -234,6 +238,8 @@ const createEtudiant = async (req, res, user_id) => {
                     etudiant = await Etudiant.create(etudiant);
 
                     etudiant.setUser(user_id);
+                    console.log("🚀 ~ file: auth.controller.js ~ line 241 ~ createEtudiant ~ user_id", user_id)
+                
 
                     anneeUniversitaire = {
                         annee: getNewAnneeUniversitaire(),
@@ -266,7 +272,7 @@ const createEtudiant = async (req, res, user_id) => {
                 console.log(error);
                 return {
                     status: 500,
-                    message: "Internal server error"
+                    message: "Internal server error 1"    
                 };
             }
         } else {

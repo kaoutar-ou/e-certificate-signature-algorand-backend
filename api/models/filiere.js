@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/db');
-const ElementDeNote = require('./elementDeNote');
+const ElementDeNote = require('./ElementDeNote');
 const Etablissement = require('./Etablissement');
 
 const Filiere = sequelize.define('Filiere', {
@@ -46,6 +46,8 @@ Etablissement.hasMany(Filiere);
 Filiere.hasMany(ElementDeNote);
 
 ElementDeNote.belongsTo(Filiere);
+
+// ElementDeNote.hasOne(Filiere);
 
 
 module.exports = Filiere;

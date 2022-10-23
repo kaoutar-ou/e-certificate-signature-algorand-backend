@@ -24,6 +24,8 @@ const {
 const User = require("../models/User");
 const AnneeUniversitaire = require("../models/AnneeUniversitaire");
 const Etudiant = require("../models/Etudiant");
+const ElementDeNote = require("../models/ElementDeNote");
+const Note = require("../models/Note");
 
 const basedir = process.cwd();
 const dir = path.join(basedir, "uploads", "excel");
@@ -77,7 +79,7 @@ const uploadExcelEtudiant = async (req, res) => {
 
     const missingRowsCheck = excelEtudiantMissingRowNamesCheck(data[0]);
     if (missingRowsCheck != null) {
-        console.log("missingRowsCheck");
+      console.log("missingRowsCheck");
       return res.status(400).send({ message: missingRowsCheck });
     }
 
@@ -103,79 +105,75 @@ const uploadExcelEtudiant = async (req, res) => {
               let existantUser = null;
               existantUser = await User.findOne({
                 where: {
-                    [Sequelize.Op.or]: [
-                        { cin: row.cin, },
-                        { username: generateUsername(row.nom, row.prenom) },
-                    ],
+                  [Sequelize.Op.or]: [
+                    { cin: row.cin },
+                    { username: generateUsername(row.nom, row.prenom) },
+                  ],
                 },
               });
 
               console.log(existantUser == null);
 
               if (existantUser == null || existantUser == undefined) {
-
                 try {
-                let password = generatePassword(16);
-                let user = await User.create({
-                  nom: row.nom,
-                  prenom: row.prenom,
-                  cin: row.cin,
-                  email: generateEmail(row.nom, row.prenom, ["etudiant"]),
-                  username: generateUsername(row.nom, row.prenom),
-                  password: password.hash,
-                });
-                user.setRoles([roleID]);
-
-                let etudiant = await Etudiant.create({
-                  cne: row.cne,
-                  code_apogee: row.code_apogee,
-                  date_naissance: row.date_naissance,
-                  telephone: row.telephone,
-                  address: row.adresse,
-                  ville: row.ville,
-                  pays: row.pays,
-                  date_inscription: row.date_inscription,
-                  date_sortie: null,
-                });
-
-                etudiant.setUser(user.id);
-
-                let anneeUniversitaire = null;
-
-                if (row.annee_universitaire) {
-                  anneeUniversitaire = await AnneeUniversitaire.create({
-                    annee: row.annee_universitaire,
-                    // EtudiantId: etudiant.id,
-                    // FiliereId: filiereID
+                  let password = generatePassword(16);
+                  let user = await User.create({
+                    nom: row.nom,
+                    prenom: row.prenom,
+                    cin: row.cin,
+                    email: generateEmail(row.nom, row.prenom, ["etudiant"]),
+                    username: generateUsername(row.nom, row.prenom),
+                    password: password.hash,
                   });
-                  console.log(anneeUniversitaire.id);
+                  user.setRoles([roleID]);
 
-                etudiant.addAnneeUniversitaire(anneeUniversitaire.id);
-
-                } else {
-                  anneeUniversitaire = await AnneeUniversitaire.create({
-                    annee: getNewAnneeUniversitaire(),
-                    // EtudiantId: etudiant.id,
-                    // FiliereId: filiereID
+                  let etudiant = await Etudiant.create({
+                    cne: row.cne,
+                    code_apogee: row.code_apogee,
+                    date_naissance: row.date_naissance,
+                    telephone: row.telephone,
+                    address: row.adresse,
+                    ville: row.ville,
+                    pays: row.pays,
+                    date_inscription: row.date_inscription,
+                    date_sortie: null,
                   });
-                  console.log(anneeUniversitaire.id);
-                etudiant.addAnneeUniversitaire(anneeUniversitaire.id);
 
-                }
-                anneeUniversitaire.setEtudiant(etudiant.id);
-                anneeUniversitaire.setFiliere(filiereID);
+                  etudiant.setUser(user.id);
 
-                // etudiant.addAnneeUniversitaire(anneeUniversitaire.id);
+                  let anneeUniversitaire = null;
 
-                // user.addFiliere([filiereID]);
+                  if (row.annee_universitaire) {
+                    anneeUniversitaire = await AnneeUniversitaire.create({
+                      annee: row.annee_universitaire,
+                      // EtudiantId: etudiant.id,
+                      // FiliereId: filiereID
+                    });
+                    console.log(anneeUniversitaire.id);
 
-                
-                    // TODO .. uncomment ...
-                    // user._id && etudiant._id && sendNewUserEmail(user, password.plain);
-                studentCount++;
+                    etudiant.addAnneeUniversitaire(anneeUniversitaire);
+                  } else {
+                    anneeUniversitaire = await AnneeUniversitaire.create({
+                      annee: getNewAnneeUniversitaire(),
+                      // EtudiantId: etudiant.id,
+                      // FiliereId: filiereID
+                    });
+                    console.log(anneeUniversitaire.id);
+                    etudiant.addAnneeUniversitaire(anneeUniversitaire);
+                  }
+                  anneeUniversitaire.setEtudiant(etudiant.id);
+                  anneeUniversitaire.setFiliere(filiereID);
+
+                  // etudiant.addAnneeUniversitaire(anneeUniversitaire);
+
+                  // user.addFiliere(filiere);
+
+                  // TODO .. uncomment ...
+                  // user._id && etudiant._id && sendNewUserEmail(user, password.plain);
+                  studentCount++;
                 } catch (error) {
-                    console.log(error);
-                    // console.log("error");
+                  console.log(error);
+                  // console.log("error");
                 }
               }
             }
@@ -224,9 +222,6 @@ const uploadExcelEtudiant = async (req, res) => {
   }
 };
 
-
-
-
 const uploadExcelNotes = async (req, res) => {
   let filePath = path.join(dir, req?.file?.filename);
   let noteCount = 0;
@@ -234,121 +229,202 @@ const uploadExcelNotes = async (req, res) => {
 
   try {
     if (
-        req.file == undefined ||
-        req.file == null ||
-        req.file?.filename == undefined ||
-        req.file?.filename == null
-      ) {
-        return res.status(400).send({ message: "Please upload an Excel file!" });
-      }
-
-  const file = readExcelFile.readFile(filePath);
-
-      const sheetNames = file.SheetNames;
-
-      let filiereAbbr = req?.body?.filiere ? req.body.filiere : null;
-  let filiere = await Filiere.findOne({
-    where: sequelize.where(
-      sequelize.fn("lower", sequelize.col("abbr")),
-      sequelize.fn("lower", filiereAbbr)
-    ),
-  });
-  let filiereID = filiere?.dataValues?.id ? filiere.dataValues.id : null;
-
-  console.log(filiereID);
-  let totalRows = 0;
-  let noteRow
-
-  for (let i = 0; i < sheetNames.length; i++) {
-    const sheet = file.Sheets[sheetNames[i]];
-    const data = readExcelFile.utils.sheet_to_json(sheet);
-    // console.log(data);
-    totalRows += data.length;
-
-    const missingRowsCheck = excelNoteMissingRowNamesCheck(data[0]);
-    if (missingRowsCheck != null) {
-        console.log("missingRowsCheck");
-      return res.status(400).send({ message: missingRowsCheck });
+      req.file == undefined ||
+      req.file == null ||
+      req.file?.filename == undefined ||
+      req.file?.filename == null
+    ) {
+      return res.status(400).send({ message: "Please upload an Excel file!" });
     }
 
-    await Promise.all(
+    const file = readExcelFile.readFile(filePath);
+
+    const sheetNames = file.SheetNames;
+
+    let filiereAbbr = req?.body?.filiere ? req.body.filiere : null;
+    let filiere = await Filiere.findOne({
+      where: sequelize.where(
+        sequelize.fn("lower", sequelize.col("abbr")),
+        sequelize.fn("lower", filiereAbbr)
+      ),
+    });
+    let filiereID = filiere?.dataValues?.id ? filiere.dataValues.id : null;
+
+    console.log(filiereID);
+    let totalRows = 0;
+    let noteRow;
+
+    for (let i = 0; i < sheetNames.length; i++) {
+      const sheet = file.Sheets[sheetNames[i]];
+      const data = readExcelFile.utils.sheet_to_json(sheet);
+      // console.log(data);
+      totalRows += data.length;
+
+      const missingRowsCheck = excelNoteMissingRowNamesCheck(data[0]);
+      if (missingRowsCheck != null) {
+        console.log("missingRowsCheck");
+        return res.status(400).send({ message: missingRowsCheck });
+      }
+
+      await Promise.all(
         data.map(async (row) => {
-            if(excelNoteMissingRowValuesCheck(row)) {
-                if (filiereID == null || filiereAbbr == row.filiere.toUpperCase()) {
-                    // console.log("filiereID"+filiereID);
-                    filiereAbbr = row.filiere.toUpperCase();
-                    if (filiereID == null) {
-                        // console.log("filiereIDNull"+filiereID);
-                      filiere = await Filiere.findOne({
-                        where: sequelize.where(
-                          sequelize.fn("lower", sequelize.col("abbr")),
-                          sequelize.fn("lower", filiereAbbr)
-                        ),
-                      });
-                      filiereID = filiere?.dataValues?.id
-                        ? filiere.dataValues.id
-                        : null;
-                    }
-                    
-                    // console.log("filiere.dataValues");
-                    // console.log(filiere.dataValues.id);
-                    // console.log(filiereID);
-        
-                    if (filiereID != null) {
-                        // console.log("filiereID2"+filiereID);
-                        let etudiant = null;
-                        etudiant = await Etudiant.findOne({
+          if (excelNoteMissingRowValuesCheck(row)) {
+            if (filiereID == null || filiereAbbr == row.filiere.toUpperCase()) {
+              // console.log("filiereID"+filiereID);
+              filiereAbbr = row.filiere.toUpperCase();
+              if (filiereID == null) {
+                // console.log("filiereIDNull"+filiereID);
+                filiere = await Filiere.findOne({
+                  where: sequelize.where(
+                    sequelize.fn("lower", sequelize.col("abbr")),
+                    sequelize.fn("lower", filiereAbbr)
+                  ),
+                });
+                filiereID = filiere?.dataValues?.id
+                  ? filiere.dataValues.id
+                  : null;
+              }
+
+              console.log("filiere.dataValues");
+              // console.log(filiere.dataValues.id);
+              // console.log(filiereID);
+
+              if (filiereID != null) {
+                console.log("filiereID2" + filiereID);
+                let etudiant = null;
+                console.log("row.cne " + row.code_apogee);
+                etudiant = await Etudiant.findOne({
+                  where: {
+                    code_apogee: row.code_apogee,
+                  },
+                });
+
+                if (etudiant != null && etudiant != undefined) {
+                  console.log("etudiant" + filiereID);
+                  let anneeUniversitaire = null;
+                  anneeUniversitaire = await AnneeUniversitaire.findOne({
+                    where: {
+                      annee: row.annee_universitaire,
+                      EtudiantId: etudiant.id,
+                      FiliereId: filiereID,
+                    },
+                  });
+
+                  if (
+                    anneeUniversitaire == null ||
+                    anneeUniversitaire == undefined
+                  ) {
+                    anneeUniversitaire = await AnneeUniversitaire.create({
+                      annee: row.annee_universitaire,
+                      // EtudiantId: etudiant.dataValues.id,
+                      // FiliereId: filiereID,
+                    });
+                    etudiant.addAnneeUniversitaire(anneeUniversitaire);
+                    anneeUniversitaire.setEtudiant(etudiant);
+                    anneeUniversitaire.setFiliere(filiereID);
+                  }
+
+                  if (
+                    row.admis &&
+                    (row.admis.toLowerCase() == "oui" ||
+                      row.admis.toLowerCase() == "yes" ||
+                      row.admis.toLowerCase() == "true" ||
+                      row.admis.toLowerCase() == "1" ||
+                      row.admis.toLowerCase() == "vrai" ||
+                      row.admis.toLowerCase() == "y" ||
+                      row.admis.toLowerCase() == "o")
+                  ) {
+                    console.log("admis");
+                    anneeUniversitaire.setIsAdmis = true;
+                    await AnneeUniversitaire.update(
+                        { isAdmis: true },
+                        {
                             where: {
-                                code_apogee: row.code_apogee,
+                                id: anneeUniversitaire.id,
                             },
-                        });
-
-                        if (etudiant != null && etudiant != undefined) {
-                            console.log("etudiant" + filiereID);
-                            let anneeUniversitaire = null;
-                            anneeUniversitaire = await AnneeUniversitaire.findOne({
-                                where: {
-                                    annee: row.annee_universitaire,
-                                    EtudiantId: etudiant.id,
-                                    FiliereId: filiereID,
-                                },
-                            });
-
-                            if (anneeUniversitaire == null || anneeUniversitaire == undefined) {
-                                anneeUniversitaire = await AnneeUniversitaire.create({
-                                    annee: row.annee_universitaire,
-                                    // EtudiantId: etudiant.dataValues.id,
-                                    // FiliereId: filiereID,
-                                });
-                                etudiant.addAnneeUniversitaire(anneeUniversitaire.id);
-                                anneeUniversitaire.setEtudiant(etudiant.dataValues.id);
-                                anneeUniversitaire.setFiliere(filiereID);
-                            }
-
-                            // console.log("filiereID")
-                            // console.log(filiereID)
-                            noteRow = await getNoteRow(row, filiereID);
-                
                         }
-                    }
-                }
-            }
-        })
-    )
+                    );
+                  }
 
-  }
-  
-  return res.status(200).send({ message: "Excel file uploaded successfully" });
+                  console.log("filiereID");
+                  // console.log(filiereID)
+                  noteRow = await getNoteRow(row, filiereID);
+
+                  if (Object.keys(noteRow).length > 0) {
+                    await Promise.all(
+                      Object.keys(noteRow).map(async (noteRowKey) => {
+                        let elementDeNote;
+                        let note;
+                        elementDeNote = await ElementDeNote.findByPk(
+                          noteRowKey
+                        );
+
+                        if (
+                          elementDeNote != null &&
+                          elementDeNote != undefined
+                        ) {
+                          let elementDeNoteId = elementDeNote.dataValues.id;
+                          note = await Note.findOne({
+                            where: {
+                              ElementDeNoteId: elementDeNote.id,
+                              EtudiantId: etudiant.id,
+                            },
+                          });
+
+                          if (note == null || note == undefined) {
+                            note = await Note.create({
+                              note: noteRow[noteRowKey],
+                            });
+                            note.setEtudiant(etudiant);
+                            note.setElementDeNote(elementDeNote);
+                            noteCount++;
+                          }
+                        }
+                        elementDeNote = null;
+                        note = null;
+                      })
+                    );
+                    // studentCount++;
+                  }
+                }
+              }
+            }
+          }
+        })
+      ).then(async () => {
+        deleteFile(filePath);
+        let message = "";
+        if (noteCount == 1) {
+            message =
+            "Excel file uploaded successfully: " +
+            noteCount +
+            " note added" 
+            // for " + 
+            // studentCount + " student";
+        } else if (noteCount > 1) {
+            message =
+            "Excel file uploaded successfully: " +
+            noteCount +
+            " notes added"
+            //  for " + 
+            // studentCount + (studentCount > 1 ? " students" : " student");
+        } else {
+            message = "Excel file uploaded successfully : " + "No Note added";
+        }
+        res.status(200).send({
+            message: message,
+        });
+        return;
+        });
+    }
   } catch (error) {
     console.log(error);
+    deleteFile(filePath);
     return res.status(500).send({ message: "Internal server error" });
   }
-
-}
-
+};
 
 module.exports = {
   uploadExcelEtudiant,
-    uploadExcelNotes,
+  uploadExcelNotes,
 };
-

@@ -156,6 +156,7 @@ const getNoteRow = async (row, filiereID) => {
       }
     })
   );
+  console.log("noteRow");
   console.log(noteRow);
   return noteRow;
 };
