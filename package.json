@@ -29,6 +29,7 @@
     "pdf2pic": "^2.1.4",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
+    "puppeteer": "^18.2.0",
     "qrcode": "^1.5.1",
     "read-excel-file": "^5.5.2",
     "sequelize": "^6.25.2",

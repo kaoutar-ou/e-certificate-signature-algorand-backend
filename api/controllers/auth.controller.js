@@ -144,7 +144,7 @@ const checkAuth = async (req, res, user) => {
     console.log("token", token);
 
     if (authorities.includes("ROLE_ETUDIANT")) {
-        Etudiant.findOne({ where: { user_id: user.id } }).then((etudiant) => {
+        Etudiant.findOne({ where: { UserId: user.id } }).then((etudiant) => {
             req.session.token = token;
             res.status(200).send({
                 id: user.id,
@@ -152,7 +152,7 @@ const checkAuth = async (req, res, user) => {
                 email: user.email,
                 roles: authorities,
                 accessToken: token,
-                etudiant: etudiant
+                etudiant: etudiant.dataValues
             });
         })
        
