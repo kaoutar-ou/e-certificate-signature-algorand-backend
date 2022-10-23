@@ -34,7 +34,8 @@ const studentProfile = async (req, res) => {
         await profile(req, res, student);
     }
     else {
-        res.status(404).json({
+        res.status(200).json({
+            student : {visibility : student.dataValues.visibility},
             message: "Student not found or has a private profile"
         })
     }

@@ -151,7 +151,7 @@ const generateForAllStudents = async (req, res) => {
             console.log("🚀 ~ file: process.controller.js ~ line 236 ~ generateCertificate ~ certificat", certificat)
         
             await student_.addCertificat(certificat);
-            
+
             console.log("🚀 ~ file: process.controller.js ~ line 239 ~ generateCertificate ~ student_", student_)
             // await generateQRCode(filename).then(() => {
             //     data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
@@ -280,7 +280,33 @@ const generateCertificate = async (req, res) => {
 
 }
 
+const sendFile = async (req, res) => {
+    console.log("sendFile");
+    console.log("🚀 ~ file: process.controller.js ~ line 235 ~ sendFile ~ req", req.query.hash.replace(/\s/g, '+'))
+    const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
+    console.log(filename);
+    const file = path.join(process.cwd(), 'uploads', 'certificates', filename.split('_')[0], `${filename}` + '.pdf');
+    console.log(file);
+    const fileExists = await fs.existsSync(file);
+    if (fileExists) {
+
+        res.header('Content-Type', 'application/pdf');
+        res.header('Content-Disposition', 'attachment; filename=' + filename + '.pdf');
+        // res.sendFile(file);
+        var data = fs.readFileSync(file);
+        res.contentType("application/pdf");
+        res.send(data);
+    }
+    else {
+        res.status(404).json({
+            message: "Certificate not found"
+        })
+    }
+}
+
+
 module.exports = {
     generateForAllStudents,
-    generateCertificate
+    generateCertificate,
+    sendFile,
 }
