@@ -69,7 +69,7 @@ sequelize.authenticate().then(() => {
 });
 
 // ? auth routes
-app.use(fileUpload());
+
 app.use("/api/auth", routesUser);
 
 
@@ -86,7 +86,7 @@ app.use("/api/process", routesProcess);
 app.use("/api/upload", routesUpload);
 
 // ? profile routes
-
+app.use(fileUpload());
 app.use("/api/profile", routesProfile);
 
 
