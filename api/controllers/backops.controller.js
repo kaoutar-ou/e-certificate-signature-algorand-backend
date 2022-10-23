@@ -7,7 +7,7 @@ const Etudiant = require("../models/Etudiant");
 const AnneeUniversitaire = require("../models/AnneeUniversitaire");
 
 const sequelize = require("../../config/db");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const Sequelize = require("sequelize");
 const ElementDeNote = require("../models/ElementDeNote");
 const Note = require("../models/Note");
@@ -273,6 +273,14 @@ const getAllEtudiants = async (req, res) => {
     //     }
     // }
 
+    if(filiere != null && filiere != undefined && filiere.id != null && filiere.id != undefined) {
+        where = {
+            [Sequelize.Op.and]: [
+                where,
+                { "$AnneeUniversitaires.Filiere.id$": filiere.id }
+            ]
+        }
+    }
     // if(valide != null && valide != undefined) {
     //     where.valide = valide;
     // }
@@ -424,6 +432,42 @@ const getAllEtudiants = async (req, res) => {
     });
 }
 
+const getAllCertificatsByFiliere = async (req, res) => {
+
+    let filiereAbbr = req?.query?.filiere ? req.query.filiere : null;
+
+    let certificats = await Certificat.findAll({
+        where: {
+            txnHash: null,
+        },
+        include: [
+            {
+                model: Etudiant,
+                as: "Etudiant",
+                include: [
+                    {
+                        model: User,
+                        as: "User",
+                    }
+                ]
+            },
+            {
+                model: Filiere,
+                as: "Filiere",
+                where: {
+                    abbr: filiereAbbr,
+                },
+            }
+        ]
+    });
+
+    return res.status(200).send(
+        {
+            certificats
+        }
+    )
+}
+
 module.exports = {
     createUniversity,
     createEtablissement,
@@ -432,4 +476,5 @@ module.exports = {
     getAllEtudiants,
     getAllFilieres,
     getAllAnneeUniversitaires,
+    getAllCertificatsByFiliere,
 }

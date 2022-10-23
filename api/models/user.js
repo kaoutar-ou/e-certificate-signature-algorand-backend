@@ -44,5 +44,6 @@ const User = sequelize.define('User', {
 });
 
 Etudiant.belongsTo(User);
+User.hasOne(Etudiant);
 
 module.exports = User;

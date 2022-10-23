@@ -1,4 +1,4 @@
-const Role = require("../api/models/role");
+const Role = require("../api/models/Role");
 
 const initial=async ()=> {
 
