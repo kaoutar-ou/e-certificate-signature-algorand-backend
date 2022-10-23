@@ -7,9 +7,12 @@ const Sequelize = require("sequelize");
 const initial = require("./init");
 const User = require("./api/models/User");
 const Role = require("./api/models/Role");
+const routesProcess = require("./api/routes/process");
 const routesUser = require("./api/routes/user");
 const routesBackops = require("./api/routes/backops");
 const routesUpload = require("./api/routes/upload");
+const routesProfile = require("./api/routes/profile");
+
 
 dotenv.config();
 
@@ -85,14 +88,14 @@ app.use("/api/auth", routesUser);
 
 app.use("/api/backops", routesBackops);
 
-// // ? process routes
+// ? process routes
 
-// app.use("/api/process", routesProcess);
+app.use("/api/process", routesProcess);
 
 // ? upload routes
 
 app.use("/api/upload", routesUpload);
 
-// // ? profile routes
+// ? profile routes
 
-// app.use("/api/profile", routesProfile);
+app.use("/api/profile", routesProfile);
