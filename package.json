@@ -21,7 +21,7 @@
     "fs-extra": "^10.1.0",
     "getmac": "^5.20.0",
     "handlebars": "^4.7.7",
-    "js-model-mapper": "^1.0.0",
+    "j-mapper": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^2.3.3",
