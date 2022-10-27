@@ -51,7 +51,7 @@ const generateQRCode = async (data_) => {
 
 
     const encrypted = encryptFilename(data_);
-    var qr_url = "http://192.168.137.139:22840/verification?hash=" + encrypted;
+    var qr_url = "http://localhost:22840/verification?hash=" + encrypted;
     const opts = {
         errorCorrectionLevel: 'H',
         type: 'terminal',
