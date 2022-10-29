@@ -155,28 +155,7 @@ const generateForAllStudents = async (req, res) => {
             await student_.addCertificat(certificat);
 
             console.log("🚀 ~ file: process.controller.js ~ line 239 ~ generateCertificate ~ student_", student_)
-            // await generateQRCode(filename).then(() => {
-            //     data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
-            // });
-
-            // await process_.generateCertificate(data_)
-            // const hash = await process_.hashDocument(data_.test.fileName);
-            // console.log("hash", hash);
-
-            // const student_ = await Etudiant.findOne({ where: { cne: student.cne } });
-            // const filiere_ = await Filiere.findOne({ where: { abbr: filiere } });
-
-            // const certificat = await Certificat.create({
-            //     fileName: encryptFilename(filename),
-            // });
-
-            // certificat.setEtudiant(student_.id);
-            // certificat.setFiliere(filiere_.id);
-
-
-
-            // await student_.addCertificat(certificat);
-            // console.log("certificat", certificat);
+           
 
         })).then(() => {
 
@@ -362,11 +341,37 @@ const displayStudentInfo = async (req, res) => {
 }
 
 
+const updateCertificat = async(req, res) =>{
+    const txnHash = req.body.txnHash;
+    const id = req.body.id;
+
+    const certificat = await Certificat.findOne({ where: { id: id } });
+    
+    if (certificat) {
+        await Certificat.update({ txnHash }, { where: { id: id } });
+        res.status(200).json({
+            message: "certificat updated successfully",
+        })
+    }
+    else {
+        res.status(404).json({
+            message: "certificat not found"
+        })
+    }
+}
+  
+
+    
+    
+
+
+
 
 
 module.exports = {
     generateForAllStudents,
     generateCertificate,
     sendFile,
-    displayStudentInfo
+    displayStudentInfo,
+    updateCertificat
 }
