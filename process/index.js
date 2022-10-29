@@ -46,8 +46,17 @@ const hashDocument = async (filename) => {
     const hashSum = crypto.createHash('sha256');
     hashSum.update(filereader);
     const hex = hashSum.digest('hex');
+    let unsignedIntegers = hex.match(/[\dA-F]{2}/gi).map(function(s) {
+        return parseInt(s, 16);
+      });
+    let typedArray = new Uint8Array(unsignedIntegers);
+    console.log(typedArray);
     return hex;
 }
+
+
+
+
 
 module.exports = {
     generateCertificate,
