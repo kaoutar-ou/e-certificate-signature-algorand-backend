@@ -97,6 +97,7 @@ const uploadProfileImage = async (req, res) => {
     const user = await User.findOne({ where: { id: req.query.id } });
     if (user) {
         await Etudiant.findOne({ where: { UserId: user.id } }).then((etudiant) => {
+            console.log("etudiant", etudiant);
 
             if(etudiant.avatar){
                 const oldAvatar = path.join(process.cwd(), 'uploads', 'avatars', etudiant.avatar);

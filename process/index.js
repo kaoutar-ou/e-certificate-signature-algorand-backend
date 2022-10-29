@@ -46,10 +46,19 @@ const hashDocument = async (filename) => {
     const hashSum = crypto.createHash('sha256');
     hashSum.update(filereader);
     const hex = hashSum.digest('hex');
-    console.log(hex);
-    return hex;
+
+    let unsignedIntegers = hex.match(/[\dA-F]{2}/gi).map(function(s) {
+        return parseInt(s, 16);
+      });
+    let typedArray = new Uint8Array(unsignedIntegers);
+    console.log(typedArray);
+    return typedArray;
 }
-// hashDocument(path.join(process.cwd(), 'uploads', 'certificates', 'oubenaddi-kaoutar', 'oubenaddi-kaoutar_irisi_2022-2023.pdf'));
+
+
+hashDocument(path.join(process.cwd(), 'uploads', 'certificates', 'oubenaddi-kaoutar', 'oubenaddi-kaoutar_irisi_2022-2023.pdf'));
+
+
 module.exports = {
     generateCertificate,
     hashDocument,

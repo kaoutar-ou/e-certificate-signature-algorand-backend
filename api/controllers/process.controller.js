@@ -3,10 +3,12 @@ const process_ = require('../../process');
 const path = require('path');
 const QRCode = require('qrcode');
 const CryptoJS = require("crypto-js");
+
 // const models = require("../models");
 const Certificat = require('../models/Certificat');
 const Etudiant = require('../models/Etudiant');
 const Filiere = require('../models/Filiere');
+const User = require('../models/User');
 
 
 const FILE_PATH = path.join(process.cwd(), 'uploads', 'qr-codes');
@@ -49,7 +51,7 @@ const generateQRCode = async (data_) => {
 
 
     const encrypted = encryptFilename(data_);
-    var qr_url = "http://localhost:22840/verification/" + encrypted;
+    var qr_url = "http://localhost:22840/verification?hash=" + encrypted;
     const opts = {
         errorCorrectionLevel: 'H',
         type: 'terminal',
@@ -98,9 +100,9 @@ const generateForAllStudents = async (req, res) => {
         Promise.all(students.map(async (student) => {
 
             if (!fs.existsSync(student.fullName.replace(/\s/g, '-').toLowerCase())) {
-                fs.mkdirSync(path.join(process.cwd(), 'uploads', 'certificates', student.fullName.replace(/\s/g, '-').toLowerCase()), { recursive: true });
+                fs.mkdirSync(path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase()), { recursive: true });
             }
-            const plus_info = student.fullName + "_" + filiere + "_" + student.annee_univ;
+            const plus_info = student.cne + "_" + filiere + "_" + student.annee_univ;
             const filename = plus_info.replace(/\s/g, '-').toLowerCase();
             const data_ = {
                 test: {
@@ -119,7 +121,7 @@ const generateForAllStudents = async (req, res) => {
                     ministere: ministere ? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
                     presidence: presidence ? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)) : null,
                     etablissement: etablissement ? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
-                    fileName: path.join(process.cwd(), 'uploads', 'certificates', student.fullName.replace(/\s/g, '-').toLowerCase(), `${filename}` + '.pdf'),
+                    fileName: path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase(), `${filename}` + '.pdf'),
 
                 }
             };
@@ -127,54 +129,33 @@ const generateForAllStudents = async (req, res) => {
                 data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
             })
             fs.ensureDirSync(path.join(process.cwd(), 'uploads', 'certificates'));
-        
+
             const fileName = await process_.generateCertificate(data_);
             const hash = await process_.hashDocument(data_.test.fileName);
-        
-            const student_ = await Etudiant.findOne({ where: { cne: student.cne} });
-        
-        
+
+            const student_ = await Etudiant.findOne({ where: { cne: student.cne } });
+
+
             console.log(filiere)
-        
+
             const filiere_ = await Filiere.findOne({ where: { abbr: filiere } });
-        
+
             console.log(filiere_)
             const certificat = await Certificat.create({
                 fileName: encryptFilename(filename),
             });
             console.log("🚀 ~ file: process.controller.js ~ line 230 ~ generateCertificate ~ certificat", certificat)
-            
-        
+
+
             await certificat.setEtudiant(student_.dataValues.id);
             await certificat.setFiliere(filiere_.dataValues.id);
-            
+
             console.log("🚀 ~ file: process.controller.js ~ line 236 ~ generateCertificate ~ certificat", certificat)
-        
+
             await student_.addCertificat(certificat);
 
             console.log("🚀 ~ file: process.controller.js ~ line 239 ~ generateCertificate ~ student_", student_)
-            // await generateQRCode(filename).then(() => {
-            //     data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
-            // });
-
-            // await process_.generateCertificate(data_)
-            // const hash = await process_.hashDocument(data_.test.fileName);
-            // console.log("hash", hash);
-
-            // const student_ = await Etudiant.findOne({ where: { cne: student.cne } });
-            // const filiere_ = await Filiere.findOne({ where: { abbr: filiere } });
-
-            // const certificat = await Certificat.create({
-            //     fileName: encryptFilename(filename),
-            // });
-
-            // certificat.setEtudiant(student_.id);
-            // certificat.setFiliere(filiere_.id);
-          
-
-
-            // await student_.addCertificat(certificat);
-            // console.log("certificat", certificat);
+           
 
         })).then(() => {
 
@@ -200,7 +181,7 @@ const generateForAllStudents = async (req, res) => {
 
 const generateCertificate = async (req, res) => {
 
-    
+
     console.log("req.signers", req);
     const fullname = req.body.fullName;
     const date = req.body.date;
@@ -248,7 +229,7 @@ const generateCertificate = async (req, res) => {
     const fileName = await process_.generateCertificate(data_);
     const hash = await process_.hashDocument(data_.test.fileName);
 
-    const student_ = await Etudiant.findOne({ where: { cne: cne} });
+    const student_ = await Etudiant.findOne({ where: { cne: cne } });
 
 
     console.log(filiere)
@@ -260,31 +241,34 @@ const generateCertificate = async (req, res) => {
         fileName: encryptFilename(filename),
     });
     console.log("🚀 ~ file: process.controller.js ~ line 230 ~ generateCertificate ~ certificat", certificat)
-    
+
 
     await certificat.setEtudiant(student_.dataValues.id);
     await certificat.setFiliere(filiere_.dataValues.id);
-    
+
     console.log("🚀 ~ file: process.controller.js ~ line 236 ~ generateCertificate ~ certificat", certificat)
 
     await student_.addCertificat(certificat);
     console.log("🚀 ~ file: process.controller.js ~ line 239 ~ generateCertificate ~ student_", student_)
-    
+
     console.log("certificat", certificat);
     res.status(200).json({
         message: "certificate generated successfully",
         data: {
             fileName: fileName,
-        }})
+        }
+    })
 
 
 }
 
 const sendFile = async (req, res) => {
-    
+
     const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
+    console.log("filename", filename);
     const file = path.join(process.cwd(), 'uploads', 'certificates', filename.split('_')[0], `${filename}` + '.pdf');
-   
+    console.log(file)
+
     const fileExists = await fs.existsSync(file);
     if (fileExists) {
 
@@ -302,6 +286,85 @@ const sendFile = async (req, res) => {
     }
 }
 
+const displayStudentInfo = async (req, res) => {
+
+    const hash = req.query.hash.replace(/ /g, '+');
+    console.log("hash", hash);
+    const data = decryptFilename(hash);
+    console.log("data", data.split('_')[0]);
+    const student = await Etudiant.findOne({ where: { cne: data.split('_')[0].toUpperCase() }, include: [{ model: User, as: 'User' }] });
+    const { nom, prenom, email, ...rest } = student.User;
+    const filiere = await Filiere.findOne({ where: { abbr: data.split('_')[1].toUpperCase() } });
+
+   
+ 
+
+    // order filiere keys 
+    const ordered = {};
+    Object.keys(filiere.dataValues).sort().forEach(function (key) {
+        ordered[key] = filiere.dataValues[key];
+    });
+
+    const certificat = await Certificat.findOne({ where: { fileName: hash } });
+
+    const removeUnwantedData = (data) => {
+
+        const {
+            createdAt,
+            updatedAt,
+            User,
+            id,
+            cin,
+            pays,
+            ville,
+            date_naissance,
+            date_inscription,
+            date_sortie,
+            UserId,
+            address,
+            telephone,
+            avatar,
+            visibility,
+            ...rest } = data;
+
+        return rest;
+    }
+
+    const studentInfo = { nom, prenom, email ,... removeUnwantedData(student.dataValues) };
+
+
+    res.status(200).json({
+        student: studentInfo,
+        filiere: {Diplôme :  filiere.diplome , Libelé : filiere.nom , Description : filiere.description },
+        certificat: certificat,
+    })
+}
+
+
+const updateCertificat = async(req, res) =>{
+    const txnHash = req.body.txnHash;
+    const id = req.body.id;
+
+    const certificat = await Certificat.findOne({ where: { id: id } });
+    
+    if (certificat) {
+        await Certificat.update({ txnHash }, { where: { id: id } });
+        res.status(200).json({
+            message: "certificat updated successfully",
+        })
+    }
+    else {
+        res.status(404).json({
+            message: "certificat not found"
+        })
+    }
+}
+  
+
+    
+    
+
+
 
 
 
@@ -309,4 +372,6 @@ module.exports = {
     generateForAllStudents,
     generateCertificate,
     sendFile,
+    displayStudentInfo,
+    updateCertificat
 }
