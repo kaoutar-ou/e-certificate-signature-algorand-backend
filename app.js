@@ -13,6 +13,7 @@ const routesUser = require("./api/routes/user");
 const routesBackops = require("./api/routes/backops");
 const routesUpload = require("./api/routes/upload");
 const routesProfile = require("./api/routes/profile");
+const routesAlgo = require("./api/routes/algo");
 
 
 dotenv.config();
@@ -88,6 +89,10 @@ app.use("/api/upload", routesUpload);
 // ? profile routes
 app.use(fileUpload());
 app.use("/api/profile", routesProfile);
+
+// ? algo routes
+
+app.use("/api/algo", routesAlgo);
 
 
 
