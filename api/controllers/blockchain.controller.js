@@ -5,7 +5,6 @@ const fs = require("fs");
 
 const getAlgodClient = async (req, res) => {
 
-    // let network = req.params.network ? req.params.network.toUpperCase() : "TESTNET";
     let network = req.body.network ? req.body.network.toUpperCase() : "TESTNET";
     let sender = req.body.sender;
 
@@ -18,7 +17,6 @@ const getAlgodClient = async (req, res) => {
         const data = fs.readFileSync(filePath);
         const compiledProgram = await algodClient.compile(data).do();
 
-        // Create logic signature for sender account
         const programBytes = new Uint8Array(Buffer.from(compiledProgram.result, "base64"));
         const lsig = new algosdk.LogicSigAccount(programBytes);
         sender = algosdk.mnemonicToSecretKey(process.env.MNEMONIC_CREATOR_TESTNET);
@@ -31,61 +29,53 @@ const getAlgodClient = async (req, res) => {
 
 
         console.log(params);
-        // assetAmount = 1;
-    
-        // params.fee = 1000;
-        // params.flatFee = true;
-        // console.log(params);
-    
-        // let note = undefined;
-        // // let note = certificate.User.nom + " certificate";
-    
-        // let address = sender;
-    
-        // let defaultFrozen = false;
-    
-        // let decimals = 0;
-    
-        // let total = 1;
-    
-        // let unitName = "Certif";
-        
-        // let assetName = "Certificate";
-    
-        // let assetURL = "http://certificate.ma";
-    
-        // let assetMetadataHash = new Uint8Array();
-        // console.log(assetMetadataHash)
-    
-        // let manager = undefined;
-    
-        // let reserve = undefined;
-        
-        // let freeze = undefined;
-        
-        // let clawback = undefined;
-    
-        // let signer = algodClientInfo.lsig;
-        // console.log("Signer" + signer)
-    
-        console.log("lsig")
-        console.log(lsig)
-        // let txn = algosdk.makeAssetCreateTxnWithSuggestedParams(lsig.address(), note,
-        //     total, decimals, defaultFrozen, manager, reserve, freeze,
-        //     clawback, unitName, assetName, assetURL, assetMetadataHash, params);
-    
 
+    
+        console.log("lsig");
+        console.log(lsig);
 
-        // console.log(txn)
+    assetAmount =1;
 
+    params.fee = 1000;
+    params.flatFee = true;
+    console.log(params);
 
+    let note = undefined;
 
+    let address = sender;
 
+    let defaultFrozen = false;
 
-        // console.log(params);
-        // return res.status(200).send({txn});
-        return res.status(200).send({params: params, lsig: lsig.address()});
-        // return res.status(200).send(algodClient);
+    let decimals = 0;
+
+    let total = 1;
+
+    let unitName = "Certif";
+    
+    let assetName = "Certificate";
+
+    let assetURL = "http://certificate.ma";
+
+    let assetMetadataHash = new Uint8Array();
+    console.log(assetMetadataHash)
+
+    let manager = undefined;
+
+    let reserve = undefined;
+    
+    let freeze = undefined;
+    
+    let clawback = undefined;
+
+        let txn = algosdk.makeAssetCreateTxnWithSuggestedParams(lsig.address(), note,
+            total, decimals, defaultFrozen, manager, reserve, freeze,
+            clawback, unitName, assetName, assetURL, assetMetadataHash, params);
+
+        let binaryTx = txn.toByte();
+
+        console.log("binaryTx");
+        console.log(binaryTx);
+        return res.status(200).send({params: params, lsig: binaryTx});
     }
     else {
         return res.status(401).send({message: "Unauthorized"});
