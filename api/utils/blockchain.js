@@ -60,12 +60,19 @@ const getNetworkCredentials = (network) => {
 const getAlgodClient = (network) => {
     const { algod } = getNetworkCredentials(network);
     const algodClient = new algosdk.Algodv2(
-        algod.token,
+        { "X-API-Key": algod.token },
         algod.address,
         algod.port,
     );
 
+    const algodClientInfo = {
+        token: algod.token,
+        server: algod.address,
+        port: algod.port,
+    }
+
     return algodClient;
+    // return algodClientInfo;
 };
 
 const getKmdClient = (network) => {

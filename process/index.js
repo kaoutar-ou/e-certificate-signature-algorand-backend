@@ -46,9 +46,10 @@ const hashDocument = async (filename) => {
     const hashSum = crypto.createHash('sha256');
     hashSum.update(filereader);
     const hex = hashSum.digest('hex');
+    console.log(hex);
     return hex;
 }
-
+// hashDocument(path.join(process.cwd(), 'uploads', 'certificates', 'oubenaddi-kaoutar', 'oubenaddi-kaoutar_irisi_2022-2023.pdf'));
 module.exports = {
     generateCertificate,
     hashDocument,
