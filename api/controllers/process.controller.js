@@ -341,22 +341,27 @@ const displayStudentInfo = async (req, res) => {
 }
 
 
-const updateCertificat = async(req, res) =>{
-    const txnHash = req.body.txnHash;
-    const id = req.body.id;
+const updateCertificat = async(certificateInfo) =>{
+    const txnHash = certificateInfo.txnId;
+    const id = certificateInfo.certificateId;
 
-    const certificat = await Certificat.findOne({ where: { id: id } });
+    // const certificat = await Certificat.findOne({ where: { id: id } });
+    const certificat = await Certificat.findByPk(id);
     
     if (certificat) {
         await Certificat.update({ txnHash }, { where: { id: id } });
-        res.status(200).json({
-            message: "certificat updated successfully",
-        })
+
+        // res.status(200).json({
+        //     message: "certificat updated successfully",
+        // })
+        return true;
     }
     else {
-        res.status(404).json({
-            message: "certificat not found"
-        })
+        return false;
+        // console.log("certificat not found");
+        // res.status(404).json({
+        //     message: "certificat not found"
+        // })
     }
 }
   
@@ -373,5 +378,6 @@ module.exports = {
     generateCertificate,
     sendFile,
     displayStudentInfo,
-    updateCertificat
+    updateCertificat,
+    decryptFilename
 }

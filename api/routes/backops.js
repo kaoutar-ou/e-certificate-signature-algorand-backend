@@ -3,17 +3,20 @@ const router = express.Router();
 const { verifyToken, isSuperAdmin, isAdmin } = require("../middlwares/auth");
 
 // const { createUniverse, createEtablissement, createFiliere, getAllFilieres, sendEmailTest, getAllEtudiants, createSemestre, createModule, getAllCertificatsByFiliere, getCertifiedFilieres } = require('../controllers/backops.controller');
-const {
-    createUniversity,
-    createEtablissement,
-    createFiliere,
-    createElementDeNote,
-    getAllEtudiants, getAllFilieres,
-    getAllAnneeUniversitaires,
-    getAllCertificatsByFiliere,
-    uploadProfileImage,
-    getEtablissments
+
+const { createUniversity, 
+      createEtablissement, 
+      createFiliere, 
+      createElementDeNote, 
+      getAllEtudiants, 
+      getAllFilieres, 
+      getAllAnneeUniversitaires, 
+      getAllCertificatsByFiliere, 
+      getSignedCertificatsByFiliere,
+      uploadProfileImage,
+      getEtablissments
 } = require('../controllers/backops.controller');
+
 
 // router.post("/create-university", [verifyToken,isSuperAdmin],createUniversity);
 // router.post("/create-etablissement", [verifyToken,isSuperAdmin],createEtablissement);
@@ -27,6 +30,7 @@ router.get("/get-all-etudiants", getAllEtudiants);
 router.get("/get-all-filieres", getAllFilieres);
 router.get("/get-all-annees-universitaires", getAllAnneeUniversitaires);
 router.get("/get-all-certificats-by-filiere", getAllCertificatsByFiliere);
+router.get("/get-all-signed-certificats-by-filiere", getSignedCertificatsByFiliere);
 router.post("/upload-profile-image", uploadProfileImage);
 router.get("/get-etablissements", getEtablissments);
 
