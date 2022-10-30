@@ -9,10 +9,14 @@ const AnneeUniversitaire = require("../models/AnneeUniversitaire");
 const sequelize = require("../../config/db");
 const { Op, where } = require("sequelize");
 const Sequelize = require("sequelize");
+const Jimp = require("jimp");
 const ElementDeNote = require("../models/ElementDeNote");
 const Note = require("../models/Note");
 const { getNewAnneeUniversitaire } = require("../utils/user");
 const Certificat = require("../models/Certificat");
+
+const path = require("path");
+const fs = require("fs-extra");
 
 const createUniversity = async (req, res) => {
     let university = {
@@ -29,7 +33,7 @@ const createUniversity = async (req, res) => {
         description: req.body.description,
         date_creation: req.body.date_creation,
     };
-    
+
     try {
         university = await University.create(university);
         res.status(200).send({
@@ -61,7 +65,7 @@ const createEtablissement = async (req, res) => {
         pays: req.body.pays,
     };
 
-    if(req.body.universite) {
+    if (req.body.universite) {
         try {
             etablissement = await Etablissement.create(etablissement);
 
@@ -74,7 +78,7 @@ const createEtablissement = async (req, res) => {
 
             console.log(university);
             etablissement.setUniversity(university.id);
-        
+
             res.status(200).send({
                 message: "Etablissement created successfully",
                 etablissement: etablissement,
@@ -104,7 +108,7 @@ const createFiliere = async (req, res) => {
         diplome: req.body.diplome,
     };
 
-    if(req.body.etablissement) {
+    if (req.body.etablissement) {
         try {
             filiere = await Filiere.create(filiere);
 
@@ -116,7 +120,7 @@ const createFiliere = async (req, res) => {
             });
             console.log(etablissement);
             filiere.setEtablissement(etablissement.id);
-            
+
             res.status(200).send({
                 message: "Filiere created successfully",
                 filiere: filiere,
@@ -139,7 +143,7 @@ const createElementDeNote = async (req, res) => {
     let filiere = await Filiere.findOne({
         where: sequelize.where(sequelize.fn('lower', sequelize.col('abbr')), sequelize.fn('lower', filiereAbbr))
     });
-    if(filiere != null && filiere != undefined) {
+    if (filiere != null && filiere != undefined) {
         let elementDeNote = {
             nom: req.body.nom,
             description: req.body.description,
@@ -187,7 +191,7 @@ const getAllAnneeUniversitaires = async (req, res) => {
 
     let anneeUniversitaires = [];
     let annees = new Set([]);
-    if(filiere != null && filiere != undefined) {
+    if (filiere != null && filiere != undefined) {
         console.log("filiere found");
         anneeUniversitaires = await AnneeUniversitaire.findAll({
             attributes: ["annee"],
@@ -202,10 +206,10 @@ const getAllAnneeUniversitaires = async (req, res) => {
             attributes: [[sequelize.fn('DISTINCT', sequelize.col('annee')), 'annee']],
         });
     }
-    
+
     anneeUniversitaires.map((anneeUniversitaire) => annees.add(anneeUniversitaire.annee));
-    
-    if(!annees.has(getNewAnneeUniversitaire())) {
+
+    if (!annees.has(getNewAnneeUniversitaire())) {
         annees.add(getNewAnneeUniversitaire());
     }
 
@@ -237,18 +241,18 @@ const getAllEtudiants = async (req, res) => {
 
     let filiere = null;
     let duree = -1;
-    if(filiereAbbr != null && filiereAbbr != undefined) {
+    if (filiereAbbr != null && filiereAbbr != undefined) {
         filiere = await Filiere.findOne({
             where: sequelize.where(sequelize.fn('lower', sequelize.col('abbr')), sequelize.fn('lower', filiereAbbr))
         });
-        if(filiere != null && filiere != undefined) {
-        duree = filiere.duree;
+        if (filiere != null && filiere != undefined) {
+            duree = filiere.duree;
         }
     }
 
     let where = {};
 
-    if(searchString != null && searchString != undefined && searchString != "") {
+    if (searchString != null && searchString != undefined && searchString != "") {
         where = {
             [Sequelize.Op.or]: [
                 { "$User.nom$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
@@ -274,7 +278,7 @@ const getAllEtudiants = async (req, res) => {
     //     }
     // }
 
-    if(filiere != null && filiere != undefined && filiere.id != null && filiere.id != undefined) {
+    if (filiere != null && filiere != undefined && filiere.id != null && filiere.id != undefined) {
         where = {
             [Sequelize.Op.and]: [
                 where,
@@ -293,7 +297,7 @@ const getAllEtudiants = async (req, res) => {
 
 
     // let userWhere = {};
-    
+
     // if(searchString != null && searchString != undefined && searchString != "") {
     //     userWhere = {
     //         [Op.or]: [
@@ -382,7 +386,7 @@ const getAllEtudiants = async (req, res) => {
 
     let limit = parseInt(size);
     let offset = parseInt(page) * parseInt(size);
-    
+
     let criteria = {}
 
     criteria.where = where;
@@ -394,14 +398,14 @@ const getAllEtudiants = async (req, res) => {
     etudiants.count = 0;
     etudiants.rows = await Etudiant.findAll(criteria);
 
-    if(certified == true) {
+    if (certified == true) {
         etudiants.rows = etudiants.rows.filter((etudiant) => etudiant.Certificats.length > 0);
-    } 
-    if(certified == false) {
+    }
+    if (certified == false) {
         etudiants.rows = etudiants.rows.filter((etudiant) => etudiant.Certificats.length == 0);
     }
 
-    if(valide == true) {
+    if (valide == true) {
         etudiants.rows = etudiants.rows.filter((etudiant) => {
             let admis = 0;
             etudiant.AnneeUniversitaires.map((anneeUniversitaire) => anneeUniversitaire.isAdmis == true ? admis++ : null);
@@ -411,7 +415,7 @@ const getAllEtudiants = async (req, res) => {
         });
     }
 
-    if(valide == false) {
+    if (valide == false) {
         etudiants.rows = etudiants.rows.filter((etudiant) => {
             let admis = 0;
             etudiant.AnneeUniversitaires.map((anneeUniversitaire) => anneeUniversitaire.isAdmis == true ? admis++ : null);
@@ -421,7 +425,7 @@ const getAllEtudiants = async (req, res) => {
         });
     }
 
-    if(valide == false) {
+    if (valide == false) {
         etudiants.rows = etudiants.rows.filter((etudiant) => !etudiant.valide);
     }
 
@@ -575,6 +579,104 @@ const getSignedCertificatsByFiliere = async (req, res) => {
     )
 }
 
+
+const uploadProfileImage = async (req, res) => {
+
+    // console.log(req)
+
+
+    fs.ensureDirSync(path.join(process.cwd(), 'process', 'canvas'));
+    const maxSize = 8 * 1024 * 1024;
+
+    if (!req.files.file) {
+        return res.status(400).send({
+            message: "Please upload a file!",
+        });
+    }
+
+
+    if (req.files.file > maxSize) {
+        return res.status(400).send(
+            {
+                message: "File size cannot be larger than 8MB!",
+            }
+        );
+    }
+
+
+    const logo = req.files.file.name;
+    console.log(logo)
+    const filename = path.join(process.cwd(), 'process', 'canvas', logo);
+    console.log(filename);
+    const file = req.files.file;
+
+    if (!logo.includes('png')) {
+
+        file.mv(filename, async (err) => {
+            if (err) {
+                return res.status(500).send({ message: err });
+            }
+
+            Jimp.read(filename, function (err, image) {
+
+                if (err) {
+                    return res.status(500).send({ message: "Unsupported MIME type: image/*" });
+                }
+                else {
+                    image
+                        .resize(400, 150)
+                        .quality(95)
+                        .write(path.join(process.cwd(), 'process', 'canvas', logo.split('.')[0] + '.png'))
+
+                    fs.unlinkSync
+                        (
+                            path.join(process.cwd(), 'process', 'canvas', logo)
+                        )
+
+                    return res.status(200).send({
+                        message: "File uploaded successfully",
+                    });
+
+                }
+            })
+        })
+
+    }
+
+    else {
+        file.mv(filename, async (err) => {
+            if (err) {
+                return res.status(500).send({ message: err });
+            }
+            return res.status(200).send({
+                message: "File uploaded successfully",
+            });
+        })
+    }
+
+
+
+}
+
+
+const getEtablissments = (req, res) => {
+    const etabAbbr = [];
+    Etablissement.findAll().then((etablissements) => {
+        etablissements.map((etablissement) => {
+            etabAbbr.push(etablissement.abbr);
+        })
+        return res.status(200).send({
+            etablissements,
+           etabs: etabAbbr,
+        });
+    }).catch((err) => {
+        return res.status(500).send({
+            message: err.message || "Some error occurred while retrieving etablissements.",
+        });
+    });
+}
+
+
 module.exports = {
     createUniversity,
     createEtablissement,
@@ -585,4 +687,6 @@ module.exports = {
     getAllAnneeUniversitaires,
     getAllCertificatsByFiliere,
     getSignedCertificatsByFiliere,
+    uploadProfileImage,
+    getEtablissments
 }
