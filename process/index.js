@@ -56,7 +56,7 @@ const hashDocument = async (filename) => {
 }
 
 
-hashDocument(path.join(process.cwd(), 'uploads', 'certificates', 'oubenaddi-kaoutar', 'oubenaddi-kaoutar_irisi_2022-2023.pdf'));
+
 
 
 module.exports = {
