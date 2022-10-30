@@ -27,11 +27,14 @@ const getNetworkCredentials = (network) => {
                 
             } catch (e) {
                 algod_token = process.env.ALGOD_TOKEN_TESTNET;
-                indexer_token = process.env.INDEXER_ADDR_TESTNET;
+                indexer_token = process.env.INDEXER_TOKEN_TESTNET;
             }
 
             algod_address = process.env.ALGOD_ADDR_TESTNET;
             algod_port = process.env.ALGOD_PORT_TESTNET;
+
+            indexer_address = process.env.INDEXER_ADDR_TESTNET;
+            indexer_port = process.env.INDEXER_PORT_TESTNET;
 
             break;
         default:
@@ -78,7 +81,7 @@ const getAlgodClient = (network) => {
 const getKmdClient = (network) => {
     const { kmd } = getNetworkCredentials(network);
     const kmdClient = new algosdk.Kmd(
-        kmd.token,
+        { "X-API-Key": kmd.token },
         kmd.address,
         kmd.port
     );
@@ -88,8 +91,9 @@ const getKmdClient = (network) => {
 
 const getIndexerClient = (network) => {
     const { indexer } = getNetworkCredentials(network);
+    console.log(indexer);
     const indexerClient = new algosdk.Indexer(
-        indexer.token,
+        { "X-API-Key": indexer.token },
         indexer.address,
         indexer.port
     );

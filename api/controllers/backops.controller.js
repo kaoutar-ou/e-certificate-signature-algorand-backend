@@ -256,6 +256,7 @@ const getAllEtudiants = async (req, res) => {
                 { "$User.cin$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
                 { "$User.email$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
                 { "$User.username$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                { code_apogee: { [Sequelize.Op.like] : "%" + searchString + "%" } },
                 { cne: { [Sequelize.Op.like] : "%" + searchString + "%" } },
                 { address: { [Sequelize.Op.like] : "%" + searchString + "%" } },
                 { ville: { [Sequelize.Op.like] : "%" + searchString + "%" } },
@@ -436,10 +437,37 @@ const getAllCertificatsByFiliere = async (req, res) => {
 
     let filiereAbbr = req?.query?.filiere ? req.query.filiere : null;
 
+    let searchString = req?.query?.searchString ? req.query.searchString : null;
+    
+    let where = {
+        txnHash: null
+    };
+
+    if (searchString != null && searchString != undefined && searchString != "") {
+        where = {
+            [Sequelize.Op.and]: [
+                where,
+                {
+                    [Sequelize.Op.or]: [
+                        { "$Etudiant.User.nom$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.User.prenom$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.User.cin$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.User.email$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.User.username$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.cne$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.code_apogee$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.address$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.ville$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.pays$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                    ]
+                }
+            ]
+        }
+    }
+
+
     let certificats = await Certificat.findAll({
-        where: {
-            txnHash: null,
-        },
+        where: where,
         include: [
             {
                 model: Etudiant,
@@ -449,7 +477,7 @@ const getAllCertificatsByFiliere = async (req, res) => {
                         model: User,
                         as: "User",
                     }
-                ]
+                ],
             },
             {
                 model: Filiere,
@@ -468,6 +496,85 @@ const getAllCertificatsByFiliere = async (req, res) => {
     )
 }
 
+const getSignedCertificatsByFiliere = async (req, res) => {
+
+    let filiereAbbr = req?.query?.filiere ? req.query.filiere : null;
+    let searchString = req?.query?.searchString ? req.query.searchString : null;
+    
+    let where = {
+        txnHash: {
+            [Sequelize.Op.ne]: null,
+        }
+    };
+
+    if (searchString != null && searchString != undefined && searchString != "") {
+        where = {
+            [Sequelize.Op.and]: [
+                where,
+                {
+                    [Sequelize.Op.or]: [
+                        { "$Etudiant.User.nom$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.User.prenom$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.User.cin$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.User.email$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.User.username$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.code_apogee$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.cne$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.address$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.ville$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                        { "$Etudiant.pays$": { [Sequelize.Op.like] : "%" + searchString + "%" } },
+                    ]
+                }
+            ]
+        }
+    }
+
+    if (filiereAbbr == null) {
+        return res.status(200).send(
+            {
+                message: "Filiere is required",
+                certificats: []
+            }
+        )
+    }
+
+    let certificats = await Certificat.findAll({
+        // where: {
+        //     txnHash: {
+        //         [Sequelize.Op.ne]: null,
+        //     }
+        // },
+        where: where,
+        include: [
+            {
+                model: Etudiant,
+                as: "Etudiant",
+                include: [
+                    {
+                        model: User,
+                        as: "User",
+                    }
+                ],
+            },
+            {
+                model: Filiere,
+                as: "Filiere",
+                where: {
+                    abbr: filiereAbbr,
+                },
+            }
+        ]
+    });
+
+    console.log(certificats);
+
+    return res.status(200).send(
+        {
+            certificats
+        }
+    )
+}
+
 module.exports = {
     createUniversity,
     createEtablissement,
@@ -477,4 +584,5 @@ module.exports = {
     getAllFilieres,
     getAllAnneeUniversitaires,
     getAllCertificatsByFiliere,
+    getSignedCertificatsByFiliere,
 }
