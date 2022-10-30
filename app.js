@@ -74,9 +74,6 @@ sequelize.authenticate().then(() => {
 app.use("/api/auth", routesUser);
 
 
-// ? backops routes
-
-app.use("/api/backops", routesBackops);
 
 // ? process routes
 
@@ -88,8 +85,12 @@ app.use("/api/upload", routesUpload);
 
 // ? profile routes
 app.use(fileUpload());
+
 app.use("/api/profile", routesProfile);
 
+// ? backops routes
+
+app.use("/api/backops", routesBackops);
 // ? algo routes
 
 app.use("/api/algo", routesAlgo);
