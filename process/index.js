@@ -4,9 +4,9 @@ const crypto = require('crypto');
 const hbs = require('handlebars');
 const { fromPath } = require("pdf2pic");
 const path = require('path');
-const phantom = require('phantom');
 
-const { chromium } = require('playwright')
+
+// const { chromium } = require('playwright')
 // const fs = require('fs-extra');
 
 const compile = async function (templateName, data) {
@@ -21,55 +21,50 @@ const compile = async function (templateName, data) {
 const generateCertificate = async (data_) => {
 
     try {
-        // // const browser = await puppeteer.launch({ args: ['--allow-file-access-from-files', '--enable-local-file-accesses'] });
-        // const browser = await puppeteer.launch(
-        //     {
-        //         headless: true,
-        //         args: [
-        //             '--no-sandbox',
-        //             '--disable-setuid-sandbox',
-        //             '--disable-dev-shm-usage',
-        //             '--disable-accelerated-2d-canvas',
-        //             '--no-first-run',
-        //             '--no-zygote',
-        //             '--single-process', // <- this one doesn't works in Windows
-        //             '--disable-gpu'
-        //         ],
-        //     }
-        // );
-        // const page = await browser.newPage();
+        // const browser = await puppeteer.launch({ args: ['--allow-file-access-from-files', '--enable-local-file-accesses'] });
+        const browser = await puppeteer.launch(
+            {
+                headless: true,
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+
+                ],
+            }
+        );
+        const page = await browser.newPage();
         
-        // const content = await compile('index', data_);
+        const content = await compile('index', data_);
 
-        // await page.setContent(content);
-        // await page.emulateMediaType('screen');
-        // await page.pdf({
-        //     path: data_.test.fileName,
-        //     format: 'A4',
-        //     landscape: true,
-        //     printBackground: true,
+        await page.setContent(content);
+        await page.emulateMediaType('screen');
+        await page.pdf({
+            path: data_.test.fileName,
+            format: 'A4',
+            landscape: true,
+            printBackground: true,
+        });
+        await page.screenshot({ path:  data_.test.thumbnail, fullPage: true });
+        await browser.close();
+
+
+        // console.log("data_-------------")
+        // console.log(data_)
+        // console.log("content-----------")
+        // // console.log(content)
+        // console.log("data_.test.fileName-----------")
+        // console.log(data_.test.fileName)
+        // await phantom.create().then(function(ph) {
+        //     ph.createPage().then(function(page) {
+        //         page.setContent(content, 'https://www.google.com/').then(function(status) {
+        //             page.render("tekst.pdf").then(function() {
+        //                 console.log('Page Rendered');
+        //                 ph.exit();
+        //             });
+        //         }
+        //         );
+        //     });
         // });
-        // await page.screenshot({ path:  data_.test.thumbnail, fullPage: true });
-        // await browser.close();
-
-
-        // // console.log("data_-------------")
-        // // console.log(data_)
-        // // console.log("content-----------")
-        // // // console.log(content)
-        // // console.log("data_.test.fileName-----------")
-        // // console.log(data_.test.fileName)
-        // // await phantom.create().then(function(ph) {
-        // //     ph.createPage().then(function(page) {
-        // //         page.setContent(content, 'https://www.google.com/').then(function(status) {
-        // //             page.render("tekst.pdf").then(function() {
-        // //                 console.log('Page Rendered');
-        // //                 ph.exit();
-        // //             });
-        // //         }
-        // //         );
-        // //     });
-        // // });
 
 
 
@@ -88,42 +83,42 @@ const generateCertificate = async (data_) => {
 
 //   await browser.close()
 
-  const browser = await chromium.launch()
-  const page = await browser.newPage()
+//   const browser = await chromium.launch()
+//   const page = await browser.newPage()
 
-//   const navigationPromise = page.waitForNavigation()
+// //   const navigationPromise = page.waitForNavigation()
 
 
 
-//   await page.goto('https://theheadless.dev/posts')
+// //   await page.goto('https://theheadless.dev/posts')
 
-  const content = await compile('index', data_);
-// const content = await fs.readFile('./test.html', 'utf8');
-  await page.setContent(content)
+//   const content = await compile('index', data_);
+// // const content = await fs.readFile('./test.html', 'utf8');
+//   await page.setContent(content)
 
-//   await navigationPromise
+// //   await navigationPromise
 
     
   
 
-//   await page.pdf({
-//     path: 'hd-posts.pdf',
-//     displayHeaderFooter: true,
-//     margin: {
-//         top: '100px',
-//       bottom: '40px'
-//     },
-//     printBackground: true
-//   })
+// //   await page.pdf({
+// //     path: 'hd-posts.pdf',
+// //     displayHeaderFooter: true,
+// //     margin: {
+// //         top: '100px',
+// //       bottom: '40px'
+// //     },
+// //     printBackground: true
+// //   })
 
-          await page.pdf({
-            path: data_.test.fileName,
-            format: 'A4',
-            landscape: true,
-            printBackground: true,
-        });
+//           await page.pdf({
+//             path: data_.test.fileName,
+//             format: 'A4',
+//             landscape: true,
+//             printBackground: true,
+//         });
 
-  await browser.close()
+//   await browser.close()
 
     }
     catch (e) {
