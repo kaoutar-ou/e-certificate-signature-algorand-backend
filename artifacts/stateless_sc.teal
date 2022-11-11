@@ -1,0 +1,13 @@
+#pragma version 6
+txn RekeyTo
+global ZeroAddress
+==
+txn CloseRemainderTo
+global ZeroAddress
+==
+&&
+txn Sender
+addr RTXD6IFUU6PKBD4C3D4MZYLJJUZ55FM5W4KMZC4IR2Z6TSZNM4EJ7GAU4M
+==
+&&
+return
