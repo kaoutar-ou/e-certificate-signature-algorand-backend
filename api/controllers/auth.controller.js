@@ -281,7 +281,8 @@ const createEtudiant = async (req, res, user_id) => {
                 console.log(error);
                 return {
                     status: 500,
-                    message: "Internal server error 1"
+                    message: "Internal server error 1",
+                    error: error
                 };
             }
         } else {

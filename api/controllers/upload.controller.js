@@ -169,7 +169,7 @@ const uploadExcelEtudiant = async (req, res) => {
                   // user.addFiliere(filiere);
 
                   // TODO .. uncomment ...
-                  // user._id && etudiant._id && sendNewUserEmail(user, password.plain);
+                  user._id && etudiant._id && sendNewUserEmail(user, password.plain);
                   studentCount++;
                 } catch (error) {
                   console.log(error);
