@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const hbs = require('handlebars');
-const { fromPath } = require("pdf2pic");
 const path = require('path');
 
 
