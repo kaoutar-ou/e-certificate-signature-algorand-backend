@@ -83,8 +83,8 @@ const signup = async (req, res) => {
                         console.log(etudiantRes);
                         if (etudiantRes.status == 200) {
                             console.log("etudiant created");
-                            // TOSO .. uncomment this
-                            // user.id && etudiantRes._id && await sendNewUserEmail(user, password.plain);
+                            // TODO .. uncomment this
+                            user.id && etudiantRes._id && await sendNewUserEmail(user, password.plain);
                             return res.send({ message: "Student was registered successfully" });
                         } else {
                             // user._id && await User.findByIdAndDelete(user._id);
