@@ -26,6 +26,7 @@ const AnneeUniversitaire = require("../models/AnneeUniversitaire");
 const Etudiant = require("../models/Etudiant");
 const ElementDeNote = require("../models/ElementDeNote");
 const Note = require("../models/Note");
+const { sendNewUserEmail } = require("../utils/email");
 
 const basedir = process.cwd();
 const dir = path.join(basedir, "uploads", "excel");
@@ -169,7 +170,8 @@ const uploadExcelEtudiant = async (req, res) => {
                   // user.addFiliere(filiere);
 
                   // TODO .. uncomment ...
-                  user._id && etudiant._id && sendNewUserEmail(user, password.plain);
+                  console.log(user);
+                  user?.dataValues?.id && etudiant?.dataValues?.id && sendNewUserEmail(user?.dataValues, password?.plain);
                   studentCount++;
                 } catch (error) {
                   console.log(error);

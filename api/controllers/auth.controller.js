@@ -10,6 +10,7 @@ const sequelize = require("../../config/db");
 const AnneeUniversitaire = require("../models/AnneeUniversitaire");
 const fs = require('fs-extra');
 const path = require('path');
+const { sendNewUserEmail } = require("../utils/email");
 
 
 const signup = async (req, res) => {
@@ -84,7 +85,8 @@ const signup = async (req, res) => {
                         if (etudiantRes.status == 200) {
                             console.log("etudiant created");
                             // TODO .. uncomment this
-                            user.id && etudiantRes._id && await sendNewUserEmail(user, password.plain);
+                            // user.id && etudiantRes._id && await sendNewUserEmail(user, password.plain);
+                            user?.dataValues?.id && (etudiantRes?.dataValues?.id || etudiantRes?.id ) && sendNewUserEmail(user?.dataValues, password?.plain);
                             return res.send({ message: "Student was registered successfully" });
                         } else {
                             // user._id && await User.findByIdAndDelete(user._id);
@@ -234,10 +236,15 @@ const createEtudiant = async (req, res, user_id) => {
             let filiere
             let anneeUniversitaire
 
+            console.log("-----------------------------------------((((-");
+
             try {
                 filiere = await Filiere.findOne({
                     where: sequelize.where(sequelize.fn('lower', sequelize.col('abbr')), sequelize.fn('lower', req.body.filiere))
                 });
+
+                console.log(filiere);
+                console.log("------------------------------------------");
 
                 // TODO .. change ...
                 etudiant.date_sortie = ""
@@ -252,9 +259,10 @@ const createEtudiant = async (req, res, user_id) => {
 
                     anneeUniversitaire = {
                         annee: getNewAnneeUniversitaire(),
-                        EtudiantId: etudiant.id,
-                        FiliereId: filiere.id
+                        // EtudiantId: etudiant.id,
+                        // FiliereId: filiere.id
                     };
+
 
                     console.log(anneeUniversitaire);
 
@@ -262,7 +270,7 @@ const createEtudiant = async (req, res, user_id) => {
 
                     // etudiant.addAnneeUniversitaire(anneeUniversitaire.id);
                     anneeUniversitaire.setEtudiant(etudiant.id);
-
+                    anneeUniversitaire.setFiliere(filiere.id);
                     return {
                         status: 200,
                         _id: etudiant.id,
