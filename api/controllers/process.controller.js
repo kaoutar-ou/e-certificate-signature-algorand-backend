@@ -266,6 +266,8 @@ const generateCertificate = async (req, res) => {
 const sendFile = async (req, res) => {
 
     const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
+    console.log("----------------------filename-----------------------");
+    console.log(filename);
     console.log("filename", filename);
     const file = path.join(process.cwd(), 'uploads', 'certificates', filename.split('_')[0], `${filename}` + '.pdf');
     console.log(file)

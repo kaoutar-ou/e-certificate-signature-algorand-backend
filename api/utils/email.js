@@ -23,14 +23,15 @@ const sendEmail = async (options_) => {
 
 const sendNewUserEmail = async (user, password) => {
     console.log("sendNewUserEmail" + user);
-    let subject_ = "New Account !";
-    let text_ = "Welcome to e-certificate platform, your username is " + user.username + " and your password is " + password;
+    let subject_ = "Noveau compte !";
+    let text_ = "Bienvenue dans la platforme e-certificate, votre nom d'utilisateur est " + user.username + " et votre mot de passe est " + password;
     let html_ = `
-        <p>Dear <b>${user.username}</b>,</p>
-        <p>Welcome to e-certificate platform, here you can find your account details :</p>
-        <p><b>Username : </b>${user.username}</p>
+        <p>Bonjour <b>${user.username}</b>,</p>
+        <p>Bienvenue dans la platforme e-certificate, voici les détails de votre compte :</p>
+        <p><b>Nom d'utilisateur : </b>${user.username}</p>
         <p><b>Email : </b>${user.email}</p>
-        <p><b>Password : </b>${password}</p>
+        <p><b>Mot de passe : </b>${password}</p>
+        <p>Vous pouvez vous connectez à votre espace utilisateur à partir du lien suivant : <a href="https://e-certificate.vr4.ma/login">https://e-certificate.vr4.ma/login</a></p>
     `;
     let options = {
         to: user.email,
