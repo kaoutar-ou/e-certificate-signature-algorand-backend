@@ -1,0 +1,110 @@
+
+
+[offline]       JCMJJ2RBRKGW2XMNELLVEDCVSU3SVIAULL4BHXOQ7TWLAVXKDEKGVKDCW4      JCMJJ2RBRKGW2XMNELLVEDCVSU3SVIAULL4BHXOQ7TWLAVXKDEKGVKDCW4
+                                                 4000000000000000 microAlgos
+[online]        3FACOTXRZT6GKR4GUNFZSY6BUEVH2M6XOSBVZ7OVQP73E3A5HNDTP6HYIM      3FACOTXRZT6GKR4GUNFZSY6BUEVH2M6XOSBVZ7OVQP73E3A5HNDTP6HYIM                                2RBRKGW2XMNELLVEDCVSU3SVIAULL4BHXOQ7TWLAVXKDEKGVKDCW4                                                                                 4
+                                                 4000000000000000 microAlgos
+[offline]       54TK55AE76UIWFWF2SRTTIWUA5DHQCNLDSXDLNWHS5UMDREVMV2UHDZQKY      54TK5TXRZT6GKR4GUNFZSY6BUEVH2M6XOSBVZ7OVQP73E3A5HNDTP6HYIM                                                                                 45AE76UIWFWF2SRTTIWUA5DHQCNLDSXDLNWHS5UMDREVMV2UHDZQKY
+                                                 1000000000000000 microAlgos  
+
+
+Example command to send between two accounts:
+~$ ./sandbox goal clerk send -a 123456789 -f 3FACOTXRZT6GKR4GUNFZSY6BUEVH2M6XOSBVZ7OVQP73E3A5HNDTP6HYIM -t 54TK55AE76UIWFWF2SRTTIWUA5DHQCNLDSXDLNWHS5UMDREVMV2UHDZQKY     QP73E3A5HNDTP6HYIM -t 54TK55AE76UIWFWF2SRTTIWUA5DHQCNLDSXDLNWHS5UMDREVMV2UHDZQKY
+
+Soon after sending the transaction it will appear in indexer:
+~$ curl "localhost:8980/v2/transactions?pretty"
+
+./sandbox goal account export -a 3FACOTXRZT6GKR4GUNFZSY6BUEVH2M6XOSBVZ7OVQP73E3A5HNDTP6HYIM 
+
+list accounts  : ./sandbox goal account list 
+
+npm install algosdk
+
+pip install pyteal : to compile smart contract --> transform into teal
+
+if there are problems with pipenv 
+c:\Users\<username>\AppData\Roaming\Python\Python38\Site-Packages
+C:\Users\<username>\AppData\Roaming\Python\Python38\Scripts
+
+// go here 
+https://algobuilder.dev/guide/README.html
+
+
+
+// clears unused packages , problem node js 
+sudo apt autoremove
+
+
+
+
+
+
+./sandbox goal clerk send -a 123456789 -f 3FACOTXRZT6GKR4GUNFZSY6BUEVH2M6XOSBVZ7OVQP73E3A5HNDTP6HYIM -t DLXNWAM34XHPJXCW63BEDLSLG4Z3ZSFEK4TRDHZUGVECQR4LNMWI3BPECY
+
+change wallet 
+
+ ./sandbox goal wallet -f unencrypted-default-wallet
+
+add partkey 
+./sandbox goal account addpartkey -a 54TK55AE76UIWFWF2SRTTIWUA5DHQCNLDSXDLNWHS5UMDREVMV2UHDZQKY --roundFirstValid 0 --roundLastValid 30000
+
+change status
+ ./sandbox goal account changeonlinestatus -a 54TK55AE76UIWFWF2SRTTIWUA5DHQCNLDSXDLNWHS5UMDREVMV2UHDZQKY
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li id="ember110411" class="ember-view">
+<div class="course-material-single">
+  <div class="course-material-header">
+    <span class="course-material-name material-name-alone">Accessories</span>
+<button onclick="document.querySelector('video').playbackRate = 1;" class="btn btn-theme-filled">x1</button>
+<button onclick="document.querySelector('video').playbackRate = 1.25;" class="btn btn-theme-filled">x1.25</button>
+<button onclick="document.querySelector('video').playbackRate = 1.5;" class="btn btn-theme-filled">x1.5</button>
+<button onclick="document.querySelector('video').currentTime += 5;" class="btn btn-theme-dark-filled">+5s</button>
+<button onclick="document.querySelector('video').currentTime -= 5;" class="btn btn-theme-dark-filled">-5s</button>
+
+  </div>
+  
+</div></li>
+
+algorand_project
+myalgo
+swing, biology, impact, noise, creek, armed, loud, chimney, case, print, trouble, wood, can, outside, regret, burger, fiscal, rely, trouble, end, spatial, excite, autumn, abstract, wine
+
+algosigner
+abde_algo
+creek winter ship act transfer another else topic security hurt tuition soda route trip before skill original manual rally demand creek shoot arrange ability series
+
+
+localhost
+opera crowd reunion hybrid silly night drive galaxy harvest nature april claim myself angle quantum chef obvious surround ice report gentle yellow hint able clog
+.
+
+
+another one algosigner
+file room gaze arena excess caution anchor judge will purchase cupboard dynamic salmon bag neutral connect mushroom weasel tool vibrant sail immense loud absent predict
+KWJXTEDS6TAPH2KDJNVDD6WIR5RBXJ3MS352HB72X6U6YH4ZFFBVJE52JI
