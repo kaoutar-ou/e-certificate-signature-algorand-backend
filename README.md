@@ -558,12 +558,14 @@ And not to mention the special thanks for the outstanding community stackoverflo
 [product-screenshot-2]: github/login.png
 [contributors-shield]: https://img.shields.io/github/contributors/kaoutar-ou/e-certificate-signature-algorand-backend.svg?style=for-the-badge
 [contributors-url]: https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend/graphs/contributors
-[stars-shield]: https://img.shields.io/github/stars/kaoutar-ou/e-certificate-signature-algorand-backend.svg?style=for-the-badge
+
+[stars-shield]: https://img.shields.io/github/stars/abderox/e-certificate-signature-algorand.svg?style=for-the-badge
 [stars-url]: https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend/stargazers
 [issues-shield]: https://img.shields.io/github/issues/kaoutar-ou/e-certificate-signature-algorand-backend.svg?style=for-the-badge
 [issues-url]: https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend/issues
-[license-shield]: https://img.shields.io/github/license/kaoutar-ou/e-certificate-signature-algorand-backend.svg?style=for-the-badge
-[license-url]: https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend/blob/main/LICENSE.txt
+
+[license-shield]: https://img.shields.io/github/license/abderox/e-certificate-signature-algorand.svg?style=for-the-badge
+[license-url]: https://github.com/abderox/e-certificate-signature-algorand/blob/main/LICENSE.txt
 [Algorand]: https://img.shields.io/badge/Algorand-20232A?style=for-the-badge&logo=algorand&logoColor=white
 [Algorand-url]: https://developer.algorand.org/
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
