@@ -4,11 +4,16 @@ const path = require('path');
 const QRCode = require('qrcode');
 const CryptoJS = require("crypto-js");
 
+const request = require('request')
+
+const axios = require('axios');
+
 // const models = require("../models");
 const Certificat = require('../models/Certificat');
 const Etudiant = require('../models/Etudiant');
 const Filiere = require('../models/Filiere');
 const User = require('../models/User');
+const FormData = require('form-data');
 
 
 const FILE_PATH = path.join(process.cwd(), 'uploads', 'qr-codes');
@@ -81,6 +86,62 @@ const image = (filename) => {
 }
 
 
+
+
+
+
+
+const serverToServer = async (student, fileName) => {
+
+    console.log(fileName)
+    // return new Promise((resolve, reject) => {
+    //     console.log('2')
+
+    //     request.post(
+    //         {
+    //             url: 'http://localhost:7004/api/backops/upload-file',
+    //             formData: {
+    //                 apogee: student.code_apogee,
+    //                 file: fs.createReadStream
+    //                     (fileName)
+    //             }
+    //         },
+    //         function (err, httpResponse, body) {
+    //             if (err) {
+    //                 console.log('3')
+    //                 return reject(err);
+    //             }
+    //             else {
+    // console.log('4')
+
+    //                 fs.unlinkSync
+    //                     (
+    //                         fileName
+    //                     )
+    //                 return resolve(body);
+    //             }
+    //         }
+    //     )
+    // })
+
+    const formData = new FormData();
+    formData.append('apogee', student.cne.toLowerCase());
+    formData.append('file', fs.createReadStream(fileName));
+    // console.log(student.cne)
+    // const formData = {
+    //     apogee: student.cne,
+    //     file: fs.createReadStream(fileName)
+    // }
+    try {
+        const response = await axios.post('https://e-certificate-server.vr4.ma/api/backops/upload-file', formData);
+        console.log(response);
+    } catch (error) {
+        console.error(error);
+    }
+      
+}
+
+
 const generateForAllStudents = async (req, res) => {
 
     const students = req.body.students;
@@ -102,6 +163,98 @@ const generateForAllStudents = async (req, res) => {
             if (!fs.existsSync(student.fullName.replace(/\s/g, '-').toLowerCase())) {
                 fs.mkdirSync(path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase()), { recursive: true });
             }
+
+
+
+
+            // request.post(
+            //     {
+            //         url: 'http://localhost:7003/api/backops/upload-file',
+            //         formData: {
+            //             apogee : student.code_apogee,
+            //             file: fs.createReadStream
+            //                 (path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase()))
+            //         }
+            //     },
+            //     async function (err, httpResponse, body) {
+            //         if (err) {
+            //             return res.status(500).send({ message: err });
+            //         }
+            //         else {
+            //             fs.unlinkSync
+            //             (
+            //                 path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase())
+            //             )
+
+
+
+
+
+
+            //             const plus_info = student.cne + "_" + filiere + "_" + student.annee_univ;
+            //             const filename = plus_info.replace(/\s/g, '-').toLowerCase();
+            //             const data_ = {
+            //                 test: {
+            //                     fullName: student.fullName,
+            //                     image: image(path.join(process.cwd(), 'process', 'canvas', `${template}.png`)),
+            //                     qr_code: '',
+            //                     date,
+            //                     local,
+            //                     signer_primary: signers[0],
+            //                     signer_secondary: signers[1],
+            //                     filiere,
+            //                     cin: student.cin,
+            //                     cne: student.cne,
+            //                     mention: student.mention,
+            //                     titre_diplome,
+            //                     ministere: ministere ? image(path.join(process.cwd(), 'process', 'canvas', `${ministere}.png`)) : null,
+            //                     presidence: presidence ? image(path.join(process.cwd(), 'process', 'canvas', `${presidence}.png`)) : null,
+            //                     etablissement: etablissement ? image(path.join(process.cwd(), 'process', 'canvas', `${etablissement}.png`)) : null,
+            //                     fileName: path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase(), `${filename}` + '.pdf'),
+
+            //                 }
+            //             };
+            //             await generateQRCode(filename).then(() => {
+            //                 data_.test.qr_code = image(path.join(FILE_PATH, `${filename}.png`));
+            //             })
+            //             fs.ensureDirSync(path.join(process.cwd(), 'uploads', 'certificates'));
+
+            //             const fileName = await process_.generateCertificate(data_);
+            //             const hash = await process_.hashDocument(data_.test.fileName);
+
+            //             const student_ = await Etudiant.findOne({ where: { cne: student.cne } });
+
+
+            //             console.log(filiere)
+
+            //             const filiere_ = await Filiere.findOne({ where: { abbr: filiere } });
+
+            //             console.log(filiere_)
+            //             const certificat = await Certificat.create({
+            //                 fileName: encryptFilename(filename),
+            //             });
+            //             console.log("🚀 ~ file: process.controller.js ~ line 230 ~ generateCertificate ~ certificat", certificat)
+
+
+            //             await certificat.setEtudiant(student_.dataValues.id);
+            //             await certificat.setFiliere(filiere_.dataValues.id);
+
+            //             console.log("🚀 ~ file: process.controller.js ~ line 236 ~ generateCertificate ~ certificat", certificat)
+
+            //             await student_.addCertificat(certificat);
+
+            //             console.log("🚀 ~ file: process.controller.js ~ line 239 ~ generateCertificate ~ student_", student_)
+           
+
+
+
+            //             // return res.status(200).send({ message: "File uploaded successfully!" });
+            //         }
+            //     }
+    
+            // )
+
+
             const plus_info = student.cne + "_" + filiere + "_" + student.annee_univ;
             const filename = plus_info.replace(/\s/g, '-').toLowerCase();
             const data_ = {
@@ -131,7 +284,13 @@ const generateForAllStudents = async (req, res) => {
             fs.ensureDirSync(path.join(process.cwd(), 'uploads', 'certificates'));
 
             const fileName = await process_.generateCertificate(data_);
+
             const hash = await process_.hashDocument(data_.test.fileName);
+
+            await serverToServer(student, fileName)
+
+
+
 
             const student_ = await Etudiant.findOne({ where: { cne: student.cne } });
 
@@ -265,28 +424,36 @@ const generateCertificate = async (req, res) => {
 
 const sendFile = async (req, res) => {
 
-    const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
-    console.log("----------------------filename-----------------------");
-    console.log(filename);
-    console.log("filename", filename);
-    const file = path.join(process.cwd(), 'uploads', 'certificates', filename.split('_')[0], `${filename}` + '.pdf');
-    console.log(file)
-
-    const fileExists = await fs.existsSync(file);
-    if (fileExists) {
-
-        res.header('Content-Type', 'application/pdf');
-        res.header('Content-Disposition', 'attachment; filename=' + filename + '.pdf');
-        // res.sendFile(file);
-        var data = fs.readFileSync(file);
-        res.contentType("application/pdf");
-        res.send(data);
+    console.log("req--------------------------------------");
+    try {
+        const response = await axios.get("https://e-certificate-server.vr4.ma/api/process/get-certificate?hash="+req.query.hash);
+        res.send(response.data)
+    } catch (error) {
+        console.log(error)
+        res.send({error, message: "Certificate not found"})
     }
-    else {
-        res.status(404).json({
-            message: "Certificate not found"
-        })
-    }
+    // const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
+    // console.log("----------------------filename-----------------------");
+    // console.log(filename);
+    // console.log("filename", filename);
+    // const file = path.join(process.cwd(), 'uploads', 'certificates', filename.split('_')[0], `${filename}` + '.pdf');
+    // console.log(file)
+
+    // const fileExists = await fs.existsSync(file);
+    // if (fileExists) {
+
+    //     res.header('Content-Type', 'application/pdf');
+    //     res.header('Content-Disposition', 'attachment; filename=' + filename + '.pdf');
+    //     // res.sendFile(file);
+    //     var data = fs.readFileSync(file);
+    //     res.contentType("application/pdf");
+    //     res.send(data);
+    // }
+    // else {
+    //     res.status(404).json({
+    //         message: "Certificate not found"
+    //     })
+    // }
 }
 
 const displayStudentInfo = async (req, res) => {
