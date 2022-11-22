@@ -9,6 +9,8 @@ const Etudiant = require("../models/Etudiant");
 const User = require("../models/User");
 const { deleteFile } = require("../utils/upload");
 
+const axios = require('axios');
+
 
 const getAlgodClient = async (req, res) => {
 
@@ -164,14 +166,17 @@ const verifyDocumentHash = async (data) => {
             response = response.transaction['created-asset-index'];
             response = await indexerClient.lookupAssetByID(response).do();
             response = response.asset.params['metadata-hash'];
+            console.log("🚀 ~ file: blockchain.controller.js ~ line 169 ~ verifyDocumentHash ~ response", response.toString())
+            console.log("🚀 ~ file: blockchain.controller.js ~ line 169 ~ verifyDocumentHash ~ response", JSON.stringify(response))
 
             // let assetMetadataHash = await hashDocument(path.join(process.cwd(), 'uploads', 'certificates', 'mouzafir-abdelhadi', 'mouzafir-abdelhadi_irisi_2022-2023'+".pdf"));
             // let hash = Buffer.from(assetMetadataHash).toString('base64');
             // console.log(hash === response);
 
-            documentHash = Buffer.from(documentHash).toString('base64');
+            // documentHash = Buffer.from(documentHash).toString('base64');
             console.log("🚀 ~ file: blockchain.controller.js ~ line 172 ~ verifyDocumentHash ~ documentHash", documentHash)
-            return documentHash === response;
+            console.log(Buffer.from(documentHash).toString('base64'))
+            return documentHash === response || documentHash === JSON.stringify(response) || Buffer.from(documentHash).toString('base64') === JSON.stringify(response) || Buffer.from(documentHash).toString('base64') === response.toString();
         } catch (error) {
             console.log(error);
             return false;
@@ -194,12 +199,26 @@ const verifyCertificateAuthenticity = async (req, res) => {
             }
         ]}
     );
+    console.log("------------------------------------")
+    // console.log(certificate)
     if(certificate){
         const folderName = certificate.Etudiant.cne
         const fileName = decryptFilename(certificate.fileName);
         let documentHash = null;
         let txnHash = null;
-        documentHash = await hashDocument(path.join(process.cwd(), 'uploads', 'certificates', folderName, fileName+".pdf"));
+        // documentHash = await hashDocument(path.join(process.cwd(), 'uploads', 'certificates', folderName, fileName+".pdf"));
+        
+        try {
+            let res = await axios.post('https://e-certificate-server.vr4.ma/api/process/hash-document', {certificate});
+            documentHash = res.data.documentHash;
+            console.log(res)
+            console.log("documentHash");
+            console.log(documentHash);
+        } catch (error) {
+            console.error("error");
+            console.error(error);
+        }
+        
         txnHash = certificate.txnHash;
         console.log("🚀 ~ file: blockchain.controller.js ~ line 202 ~ verifyCertificateAuthenticity ~ txnHash", txnHash)
         
@@ -213,7 +232,7 @@ const verifyCertificateAuthenticity = async (req, res) => {
             if(response == true){
                 return res.status(200).send({message: "Certificate Verified Successfully", verified: true});
             } else {
-                return res.status(200).send({message: "Certifate Verification Failed", verified: false});
+                return res.status(200).send({message: "Certificate Verification Failed", verified: false});
             }
         } else {
             return res.status(500).send({message: "Internal Server Error"});
@@ -232,7 +251,7 @@ const verifyAttachedCertificate = async (req, res) => {
         let attachedPath = path.join(process.cwd(), 'uploads', new Date().getTime() + ".pdf");
         console.log("🚀 ~ file: blockchain.controller.js ~ line 232 ~ verifyAttachedCertificate ~ attachedPath", attachedPath)
         if (!fs.existsSync(path.join(process.cwd(), 'uploads'))) {
-            fs.mkdir(path.join(process.cwd(), 'uploads'), error => error ? console.log(error) : console.log('Directory created') ) ;
+            fs.mkdir(path.join(process.cwd(), 'uploads'), error => error ? console.log(error) : console.log('Directory created')) ;
         }
         req.files.file.mv(attachedPath, async (err) => {
             if (err) {
