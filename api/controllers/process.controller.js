@@ -56,7 +56,7 @@ const generateQRCode = async (data_) => {
 
 
     const encrypted = encryptFilename(data_);
-    var qr_url = "https://e-certificate.vr4.ma/verification?hash=" + encrypted;
+    var qr_url = "https://e-certification-.vr4.ma/verification?hash=" + encrypted;
     const opts = {
         errorCorrectionLevel: 'H',
         type: 'terminal',

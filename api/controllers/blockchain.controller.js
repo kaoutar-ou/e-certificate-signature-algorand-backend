@@ -87,7 +87,7 @@ const getAlgodClient = async (req, res) => {
                 
                 let assetName = "E-Certificate";
 
-                let assetURL = "https://e-certificate.vr4.ma";
+                let assetURL = "https://e-certification.vr4.ma";
 
                 console.log("_____________--------------___________" + assetURL);
 

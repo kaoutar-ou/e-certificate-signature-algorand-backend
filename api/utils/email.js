@@ -31,7 +31,7 @@ const sendNewUserEmail = async (user, password) => {
         <p><b>Nom d'utilisateur : </b>${user.username}</p>
         <p><b>Email : </b>${user.email}</p>
         <p><b>Mot de passe : </b>${password}</p>
-        <p>Vous pouvez vous connectez à votre espace utilisateur à partir du lien suivant : <a href="https://e-certificate.vr4.ma/login">https://e-certificate.vr4.ma/login</a></p>
+        <p>Vous pouvez vous connectez à votre espace utilisateur à partir du lien suivant : <a href="https://e-certification.vr4.ma/login">https://e-certification.vr4.ma/login</a></p>
     `;
     let options = {
         to: user.email,
