@@ -158,7 +158,8 @@ const serverToServer = async (student, fileName) => {
     formData.append('file', fs.createReadStream(fileName));
     
     try {
-        const response = await axios.post('http://localhost:7000/api/backops/upload-file', formData);
+        // const response = await axios.post('http://localhost:7000/api/backops/upload-file', formData);
+        const response = await axios.post('https://e-certificate-server.vr4.ma/api/backops/upload-file', formData);
         console.log(response);
     } catch (error) {
         console.error(error);
