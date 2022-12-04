@@ -42,6 +42,9 @@ app.use((req, res, next) => {
 
 
 
+  app.use('/test', (req, res) => {
+    res.send("test");
+});
 
 
 // ? process routes
