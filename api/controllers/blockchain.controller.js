@@ -209,7 +209,8 @@ const verifyCertificateAuthenticity = async (req, res) => {
         // documentHash = await hashDocument(path.join(process.cwd(), 'uploads', 'certificates', folderName, fileName+".pdf"));
         
         try {
-            let res = await axios.post('https://e-certificate-server.vr4.ma/api/process/hash-document', {certificate});
+            // let res = await axios.post('https://e-certificate-server.vr4.ma/api/process/hash-document', {certificate});
+            let res = await axios.post('http://localhost:7003/api/process/hash-document', {certificate});
             documentHash = res.data.documentHash;
             console.log(res)
             console.log("documentHash");
