@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 
 var corsOptions = {
-  origin: "*",
+  origin: "https://e-certificate-server.vr4.ma",
 };
 
 app.use(cors(corsOptions));

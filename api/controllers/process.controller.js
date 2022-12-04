@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const { generateCertificate } = require('../../process');
 const FormData = require('form-data');
 const axios = require('axios');
-
+const QRCode = require('qrcode');
 
 const KEY = '12345678901234567890123456789012';
 const IV = '7061737323313233';
@@ -100,6 +100,52 @@ const hashDocumentFct = async (filename) => {
 
 
 
+
+
+const encryptFilename = (filename) => {
+
+    const encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(filename), key,
+        {
+            keySize: 128 / 8,
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+    return encrypted.toString();
+}
+
+const FILE_PATH = path.join(process.cwd(), 'uploads', 'qr-codes');
+
+const generateQRCode = async (data_) => {
+
+
+    const encrypted = encryptFilename(data_);
+    var qr_url = "https://e-certification.vr4.ma/verification?hash=" + encrypted;
+    const opts = {
+        errorCorrectionLevel: 'H',
+        type: 'terminal',
+        quality: 1,
+        margin: 1,
+        color: {
+            dark: '#208698',
+            light: '#FFF',
+        },
+        width: 100,
+        height: 100
+    }
+
+    return new Promise((resolve, reject) => {
+        fs.ensureDirSync(FILE_PATH);
+        QRCode.toFile(path.join(FILE_PATH, `${data_}.png`), qr_url, opts, function (err) {
+            if (err) reject(err)
+            resolve(true)
+            console.log("decrypted", decryptFilename(encrypted));
+        })
+    })
+
+}
+
+
 function base64Encode(file) {
     return fs.readFileSync(file, { encoding: 'base64' });
 }
@@ -126,6 +172,10 @@ const generateCertification = async (req, res) => {
     if (!fs.existsSync(student.fullName.replace(/\s/g, '-').toLowerCase())) {
         fs.mkdirSync(path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase()), { recursive: true });
     }
+
+    await generateQRCode(data.general.fileName).then(() => {
+        data.test.qr_code = image(path.join(FILE_PATH, `${data.general.fileName}.png`));
+    })
 
     try {
         const fileName = await generateCertificate(data);
