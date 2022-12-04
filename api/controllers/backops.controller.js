@@ -82,7 +82,10 @@ const uploadProfileImage = async (req, res) => {
 
 const uploadFile = (req, res) => {
 
+    console.log("1")
+
     console.log(req.body.apogee);
+
 
     fs.ensureDirSync(path.join(process.cwd(), 'uploads', 'certificates',req.body.apogee));
     const maxSize = 12 * 1024 * 1024;
@@ -102,7 +105,10 @@ const uploadFile = (req, res) => {
         );
     }
 
+    console.log("2")
     const file_ = req.files.file.name;
+    console.log("3")
+
     console.log(file_)
     const filename = path.join(process.cwd(), 'uploads', 'certificates', req.body.apogee,file_);
     console.log(filename);

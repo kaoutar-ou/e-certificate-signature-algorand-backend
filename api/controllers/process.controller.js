@@ -1,7 +1,10 @@
 const fs = require('fs-extra');
 const path = require('path');
 const CryptoJS = require("crypto-js");
-
+const crypto = require('crypto');
+const { generateCertificate } = require('../../process');
+const FormData = require('form-data');
+const axios = require('axios');
 
 
 const KEY = '12345678901234567890123456789012';
@@ -34,11 +37,8 @@ const decryptFilename = (encrypted) => {
 const sendFile = async (req, res) => {
 
     const filename = decryptFilename(req.query.hash.replace(/ /g, '+'));
-    console.log("----------------------filename-----------------------");
-    console.log(filename);
-    console.log("filename", filename);
+
     const file = path.join(process.cwd(), 'uploads', 'certificates', filename.split('_')[0], `${filename}` + '.pdf');
-    console.log(file)
 
     const fileExists = await fs.existsSync(file);
     if (fileExists) {
@@ -59,10 +59,113 @@ const sendFile = async (req, res) => {
 
 
 
+const hashDocument = async (req, res) => {
+    // console.log(req.body);
+    console.log("documentHash");
+    const { certificate } = req.body;
+    console.log(req.body);
+    const folderName = certificate.Etudiant.cne
+    const fileName = decryptFilename(certificate.fileName);
+    documentHash = await hashDocumentFct(path.join(process.cwd(), 'uploads', 'certificates', folderName, fileName+".pdf"));
+
+    documentHash = Buffer.from(documentHash).toString('base64');
+
+    console.log("documentHash");
+    console.log(documentHash);
+    res.status(200).json({
+        documentHash
+    })
+}
+
   
+const hashDocumentFct = async (filename) => {
+    const filereader = await fs.readFile(filename);
+    const hashSum = crypto.createHash('sha256');
+    hashSum.update(filereader);
+    const hex = hashSum.digest('hex');
+
+    let unsignedIntegers = hex.match(/[\dA-F]{2}/gi).map(function(s) {
+        return parseInt(s, 16);
+      });
+    let typedArray = new Uint8Array(unsignedIntegers);
+    // console.log(typedArray);
+    return typedArray;
+}
 
     
     
+
+
+
+
+
+
+function base64Encode(file) {
+    return fs.readFileSync(file, { encoding: 'base64' });
+}
+
+const image = (filename) => {
+    return "data:image/png;base64," + base64Encode(filename);
+}
+
+
+const generateCertification = async (req, res) => {
+    const data = req.body.data;
+
+    console.log(data);
+    const student = req.body.student;
+
+    data.test.image = image(path.join(process.cwd(), 'process', 'canvas', `${data.general.template}.png`))
+    data.test.ministere = data.general.ministere ? image(path.join(process.cwd(), 'process', 'canvas', `${data.general.ministere}.png`)) : null
+    data.test.presidence = data.general.presidence ? image(path.join(process.cwd(), 'process', 'canvas', `${data.general.presidence}.png`)) : null
+    data.test.etablissement = data.general.etablissement ? image(path.join(process.cwd(), 'process', 'canvas', `${data.general.etablissement}.png`)) : null
+    data.test.fileName = path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase(), `${data.general.fileName}` + '.pdf')
+
+    fs.ensureDirSync(path.join(process.cwd(), 'uploads', 'certificates'));
+
+    try {
+        const fileName = await generateCertificate(data);
+        await serverToServer(student, fileName);
+        console.log("fileName");
+        res.status(200).json({
+            message: "Certificate generated successfully",
+            fileName
+        })
+    } catch (error) {
+        console.log(error);
+        console.log("error");
+        res.status(500).json({
+            message: "Error"
+        })
+    }
+}
+
+
+
+
+
+
+const serverToServer = async (student, fileName) => {
+
+    console.log(fileName)
+
+    const formData = new FormData();
+    formData.append('apogee', student.cne.toLowerCase());
+    formData.append('file', fs.createReadStream(fileName));
+    
+    try {
+        const response = await axios.post('http://localhost:7000/api/backops/upload-file', formData);
+        console.log(response);
+    } catch (error) {
+        console.error(error);
+    }
+      
+}
+
+
+
+
+
 
 
 
@@ -70,5 +173,7 @@ const sendFile = async (req, res) => {
 
 module.exports = {
     sendFile,
-    decryptFilename
+    decryptFilename,
+    hashDocument,
+    generateCertification
 }
