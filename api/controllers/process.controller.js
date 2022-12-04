@@ -123,6 +123,10 @@ const generateCertification = async (req, res) => {
 
     fs.ensureDirSync(path.join(process.cwd(), 'uploads', 'certificates'));
 
+    if (!fs.existsSync(student.fullName.replace(/\s/g, '-').toLowerCase())) {
+        fs.mkdirSync(path.join(process.cwd(), 'uploads', 'certificates', student.cne.replace(/\s/g, '-').toLowerCase()), { recursive: true });
+    }
+
     try {
         const fileName = await generateCertificate(data);
         await serverToServer(student, fileName);
