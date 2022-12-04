@@ -43,7 +43,7 @@ app.use((req, res, next) => {
 
 
   app.use('/test', (req, res) => {
-    res.send("test");
+    res.send("test1");
 });
 
 
