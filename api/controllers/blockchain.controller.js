@@ -23,13 +23,13 @@ const verifyCertificateAuthenticity = async (req, res) => {
             if (response == data.documentHash) {
                 res.status(200).send({data: "Certificate is authentic", verified: true});
             } else {
-                res.status(200).send({data: "Certificate is not authentic", verified: false});
+                res.status(200).send({data: "Certificate is not authentic", response, verified: false});
             }
         } else {
-            res.status(200).send({data: "Certificate is not authentic", verified: false});
+            res.status(200).send({data: "Certificate is not authentic", response, verified: false});
         }
     } catch (e) {
-        res.status(200).send({data: "Certificate is not authentic", verified: false});
+        res.status(200).send({data: "Certificate is not authentic", response, verified: false});
     }
 
 }
