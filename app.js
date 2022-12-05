@@ -5,6 +5,7 @@ const fileUpload = require('express-fileupload');
 const routesProcess = require("./api/routes/process");
 const routesBackops = require("./api/routes/backops");
 const routesProfile = require("./api/routes/profile");
+const routesAlgo = require("./api/routes/algo");
 
 
 
@@ -61,6 +62,7 @@ app.use("/api/profile", routesProfile);
 
 app.use("/api/backops", routesBackops);
 
+app.use("/api/algo", routesAlgo);
 
 
 
