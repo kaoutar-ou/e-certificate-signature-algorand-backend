@@ -28,14 +28,22 @@ const verifyCertificateAuthenticity = async (req, res) => {
             response = response.asset.params['metadata-hash'];
             console.log("4")
             console.log(response)
+            console.log("6")
+
+            console.log(data.documentHash)
 
             if (data.documentHash === response) {
                 // if (response == data.documentHash) {
+                    console.log("7")
+
                 res.status(200).send({data: "Certificate is authentic", verified: true});
             } else {
+            console.log("8")
                 res.status(200).send({data: "Certificate is not authentic", response, verified: false});
             }
         } else {
+            console.log("9")
+
             res.status(200).send({data: "Certificate is not authentic", response, verified: false});
         }
     } catch (e) {
