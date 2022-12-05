@@ -15,6 +15,8 @@ const verifyCertificateAuthenticity = async (req, res) => {
         const indexerClient = getIndexerClient("TESTNET");
 
         console.log("1")
+        console.log(data.txnHash)
+
         let response = await indexerClient.lookupTransactionByID(data.txnHash).do();
         console.log("2")
 
@@ -25,8 +27,9 @@ const verifyCertificateAuthenticity = async (req, res) => {
             response = await indexerClient.lookupAssetByID(response).do();
             response = response.asset.params['metadata-hash'];
             console.log("4")
+            console.log(response)
 
-            if (data.documentHash === response || data.documentHash === JSON.stringify(response) || Buffer.from(data.documentHash).toString('base64') === JSON.stringify(response) || Buffer.from(data.documentHash).toString('base64') === response.toString()) {
+            if (data.documentHash === response) {
                 // if (response == data.documentHash) {
                 res.status(200).send({data: "Certificate is authentic", verified: true});
             } else {
