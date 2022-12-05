@@ -18,11 +18,11 @@ const verifyCertificateAuthenticity = async (req, res) => {
     response = await indexerClient.lookupAssetByID(response).do();
     response = response.asset.params['metadata-hash'];
     
-    
+
     if (response == data.documentHash) {
         res.status(200).send({data: "Certificate is authentic", verified: true});
     } else {
-        res.status(200).send({data: "Certificate is not authentic", verified: false});
+        res.status(500).send({data: "Certificate is not authentic", verified: false});
     }
 }
 
