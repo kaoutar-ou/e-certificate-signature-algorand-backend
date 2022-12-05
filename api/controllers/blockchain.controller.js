@@ -8,15 +8,22 @@ const verifyCertificateAuthenticity = async (req, res) => {
     
     // res.status(200).send({data: algoHashResponse.data});
 
+    const data = req.body.data;
+
     const indexerClient = getIndexerClient("TESTNET");
 
-    let response = await indexerClient.lookupTransactionByID("QJHPC3XIPQVV4BDXYPAQNPOH5XS4RY3HPXGQTJCYLEMJSOLV3S2Q").do();
+    let response = await indexerClient.lookupTransactionByID(data.txnHash).do();
 
     response = response.transaction['created-asset-index'];
     response = await indexerClient.lookupAssetByID(response).do();
     response = response.asset.params['metadata-hash'];
     
-    res.status(200).json(response);
+    
+    if (response == data.documentHash) {
+        res.status(200).send({data: "Certificate is authentic", verified: true});
+    } else {
+        res.status(200).send({data: "Certificate is not authentic", verified: false});
+    }
 }
 
 const getIndexerClient = (network) => {
