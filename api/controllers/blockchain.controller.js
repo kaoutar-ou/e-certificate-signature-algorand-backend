@@ -31,8 +31,17 @@ const verifyCertificateAuthenticity = async (req, res) => {
             console.log("6")
 
             console.log(data.documentHash)
+            console.log("6")
+            console.log()
 
-            if (data.documentHash === response) {
+            console.log("6")
+            console.log(Buffer.from(data.documentHash).toString('base64'))
+            console.log("6")
+            console.log(response.toString())
+            console.log("6")
+            console.log(JSON.stringify(response))
+
+            if (data.documentHash === response || data.documentHash === JSON.stringify(response) || Buffer.from(data.documentHash).toString('base64') === JSON.stringify(response) || Buffer.from(data.documentHash).toString('base64') === response.toString()) {
                 // if (response == data.documentHash) {
                     console.log("7")
 
