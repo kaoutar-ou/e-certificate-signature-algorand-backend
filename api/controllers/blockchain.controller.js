@@ -48,17 +48,17 @@ const verifyCertificateAuthenticity = async (req, res) => {
                 res.status(200).send({data: "Certificate is authentic", verified: true});
             } else {
             console.log("8")
-                res.status(200).send({data: "Certificate is not authentic", response, verified: false});
+                res.status(400).send({data: "Certificate is not authentic", response, verified: false});
             }
         } else {
             console.log("9")
 
-            res.status(200).send({data: "Certificate is not authentic", response, verified: false});
+            res.status(400).send({data: "Certificate is not authentic", response, verified: false});
         }
     } catch (e) {
         console.log("5")
         console.log(e);
-        res.status(200).send({data: "Certificate is not authentic", response, verified: false});
+        res.status(400).send({data: "Certificate is not authentic", response, verified: false});
     }
 
 }
