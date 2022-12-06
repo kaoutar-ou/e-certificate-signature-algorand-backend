@@ -57,7 +57,6 @@ align="center"><a href="https://github.com/abderox/e-certificate-signature-algor
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledguts">Acknowledgments</a></li>
-    <li><a href="#cpanel-&-heroku-configuration">Cpanel & Heroku configuration</a></li>
   </ol>
 </details>
 
@@ -512,7 +511,81 @@ alt="structure frontend"
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Contributing
 
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/Enhancement`)
+3. Commit your Changes (`git commit -m 'Add some Enhancements'`)
+4. Push to the Branch (`git push origin feature/Enhancement`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- CONTACT -->
+## Contact
+
+
+  ## [![gmail][gmail.js]][gmail-url] 
+  
+  *  [Abdelhadi Mouzafir](mailto:abdelhadi12mouzafir@gmail.com)
+
+  * [Kaoutar Oubenaddi](mailto:kaoutar.oubenaddi@gmail.com)
+
+  ## [![linkedin][linkedin.js]][linkedin-url]
+      
+  * [Abdelhadi Mouzafir](https://www.linkedin.com/in/abdelhadi-mouzafir-332a20204?_l=en_US)
+  * [Kaoutar Oubenaddi](https://www.linkedin.com/in/kaoutar-oubenaddi-961158209/)
+
+## [![github][github.js]][github-url]
+  
+  * [abderox](https://github.com/abderox)
+  * [kaoutar_ou](https://github.com/kaoutar_ou)
+  
+
+***Project Links:***
+
+* [Frontend](https://github.com/abderox/e-certificate-signature-algorand)
+* [Backend](https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+We would like to thank our (teacher| client) [Mr. Omar Bencharef](https://www.linkedin.com/in/bencharef-omar-3151b289/) for his support and guidance throughout the project.
+
+We acknowledge these following (open-source| free) use technologies for
+their contributions to the open source community.
+
+* [Heroku](https://www.heroku.com/)
+* [Algorand](https://www.algorand.com/)
+* [React](https://reactjs.org/)
+* [Nodejs](https://nodejs.org/en/)
+* [Expressjs](https://expressjs.com/)
+* [Mysql](https://www.mysql.com/)
+* [Postgres](https://www.postgresql.org/)
+* [Sequelize](https://sequelize.org/)
+* [Yarn](https://yarnpkg.com/)
+* [Npm](https://www.npmjs.com/)
+
+And not to mention the special thanks for the outstanding community stackoverflow for its survival tips and guidance throughout this project.
+
+
+<!-- * [Choose an Open Source License](https://choosealicense.com) -->
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 ## Cpanel & Heroku configuration
@@ -604,85 +677,6 @@ Otherwise, if you chose to deploy the backend on **`heroku`**, you can follow th
 * Go to the `Settings` tab
 * Click on `Reveal Config Vars`
 * Add the environment variables you need to use in your project
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/Enhancement`)
-3. Commit your Changes (`git commit -m 'Add some Enhancements'`)
-4. Push to the Branch (`git push origin feature/Enhancement`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- LICENSE -->
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- CONTACT -->
-## Contact
-
-
-  ## [![gmail][gmail.js]][gmail-url] 
-  
-  *  [Abdelhadi Mouzafir](mailto:abdelhadi12mouzafir@gmail.com)
-
-  * [Kaoutar Oubenaddi](mailto:kaoutar.oubenaddi@gmail.com)
-
-  ## [![linkedin][linkedin.js]][linkedin-url]
-      
-  * [Abdelhadi Mouzafir](https://www.linkedin.com/in/abdelhadi-mouzafir-332a20204?_l=en_US)
-  * [Kaoutar Oubenaddi](https://www.linkedin.com/in/kaoutar-oubenaddi-961158209/)
-
-## [![github][github.js]][github-url]
-  
-  * [abderox](https://github.com/abderox)
-  * [kaoutar_ou](https://github.com/kaoutar_ou)
-  
-
-***Project Links:***
-
-* [Frontend](https://github.com/abderox/e-certificate-signature-algorand)
-* [Backend](https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-We would like to thank our (teacher| client) [Mr. Omar Bencharef](https://www.linkedin.com/in/bencharef-omar-3151b289/) for his support and guidance throughout the project.
-
-We acknowledge these following (open-source| free) use technologies for
-their contributions to the open source community.
-
-* [Heroku](https://www.heroku.com/)
-* [Algorand](https://www.algorand.com/)
-* [React](https://reactjs.org/)
-* [Nodejs](https://nodejs.org/en/)
-* [Expressjs](https://expressjs.com/)
-* [Mysql](https://www.mysql.com/)
-* [Postgres](https://www.postgresql.org/)
-* [Sequelize](https://sequelize.org/)
-* [Yarn](https://yarnpkg.com/)
-* [Npm](https://www.npmjs.com/)
-
-And not to mention the special thanks for the outstanding community stackoverflow for its survival tips and guidance throughout this project.
-
-
-<!-- * [Choose an Open Source License](https://choosealicense.com) -->
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
