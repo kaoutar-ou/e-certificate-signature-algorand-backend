@@ -57,6 +57,7 @@ align="center"><a href="https://github.com/abderox/e-certificate-signature-algor
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledguts">Acknowledgments</a></li>
+    <li><a href="#cpanel-&-heroku-configuration">Cpanel & Heroku configuration</a></li>
   </ol>
 </details>
 
@@ -285,15 +286,46 @@ _If you are using Postgres_
 
 * Go to pgadmin
 * Create a database named what you have have called it in the  `.env` file .
+
+12. Email configuration
+
+  In order to send emails, you need to configure your email in the `.env` file.
+    
+```sh
+    SMTP_HOST= # your email host (smtp.gmail.com for gmail)
+    SMTP_PORT= # your email port (587 for gmail)
+    SMTP_USER= # your email
+    SMTP_PASSWORD= # your email password
+    SMTP_FROM= # your email sender
+```
+
+13. Algorand configuration
   
-12. Now you can run the project locally by running the following commands in three different terminals:
+  We are using Algorand blockchain to sign the certificates, verify their authenticity and to store the certificates details in the blockchain.
+  In order to use Algorand on the project, you need to follow the steps below:
+
+* Install the AlgoSigner extension in your browser.
+* Choose the network you want to work with (TestNet for testing , MainNet for production).
+* Create a wallet in AlgoSigner, copy the mnemonic and paste it in the `.env` file.
+* Copy the address and paste it in the `.env` file.
+* Go to https://developer.purestake.io/ and create an account, then create an API key and paste it in the `.env` file.
+* Copy the Purestake Algod and Indexer API URLs and paste them in the `.env` file.
+
+```sh
+    ADDR_CREATOR_TESTNET= # your account address
+    MNEMONIC_CREATOR_TESTNET= # your mnemonic
+    ALGOD_TOKEN_TESTNET= # your API key
+    INDEXER_TOKEN_TESTNET= # your API key
+    ALGOD_ADDR_TESTNET= # your Algod API address
+    INDEXER_ADDR_TESTNET= # your Indexer API address
+```
+
+14. Now you can run the project locally by running the following commands in three different terminals:
 
 _Run node backend server_
 
 ```sh
-    
     npm run start
-     
 ```
 
 _Run react frontend server_
@@ -382,7 +414,7 @@ alt="structure backend"
 
 * **models** : Contains the models of the project , each model is responsible for a specific task . Fo example
   * **User.js** : Contains the logic of the user model .
-  * **Etudaint.js** : Contains the logic of the Etudaint model .
+  * **Etudiant.js** : Contains the logic of the Etudiant model .
   * **University.js** : Contains the logic of the University model .
 
 * **routes** : Contains the routes of the project , each route is responsible for a specific task . For example .
@@ -402,8 +434,11 @@ alt="structure backend"
     * **hbs** : stands for handlebars
 
 
-[![](https://img.shields.io/badge/INTI%20folder-blueviolet?style=for-the-badge)](https://hamzamohdzubair.github.io/redant/)
+[![](https://img.shields.io/badge/INIT%20folder-blueviolet?style=for-the-badge)](https://hamzamohdzubair.github.io/redant/)
 * **index.js** : Nothing biggy , Only to make sure the user roles are created before registering new users.
+  
+[![](https://img.shields.io/badge/ARTIFACTS%20folder-blueviolet?style=for-the-badge)](https://hamzamohdzubair.github.io/redant/)
+* **stateless_sc.teal** : Contains the logic of the smart contract , it is responsible for the verification process, it only allows the specified address to sign the certificate.
 
 **<h2>Frontend</h2>**
 <p
@@ -474,6 +509,101 @@ alt="structure frontend"
 * **package.json** : contains the dependencies of the project.
 
 
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+
+## Cpanel & Heroku configuration
+In this section, we will explain how to deploy the project on cpanel.
+
+### Database configuration
+* First go to your cpanel and click on the `Databases` tab
+* Click on `MySQL Databases`
+* On the `Create New Database` section, enter the name of your database and click on the `Create Database` button
+* Go to the `Create New User` section, enter the name of your user and click on the `Create User` button
+* Go to the `Add User to Database` section, select the database and user you created and click on the `Add` button
+* Go to the `Change Password` section, enter the password you want to use and click on the `Change Password` button
+
+To use the database, you need to update your `.env` with the following lines :
+```sh
+    HOST= # your_host
+    USER= # your_user
+    PASSWORD= # your_password
+    DB_NAME= # your_database_name
+    DIALECT= # mysql
+```
+
+Alternatively, if you already deployed the project on cpanel, heroku or any other hosting service, you can add the database configuration to your project by setting environment variables.
+
+You can add remote access to your database by following these steps :
+* Go to the `Databases` tab
+* Click on `Remote MySQL`
+* Enter the IP address of the machine you want to access the database from and click on the `Add Host` button
+
+<a name="domain-conf"></a>
+
+### Domain configuration
+* Go to the `Domains` tab
+* Click on `Domains`
+* Click on the `Create a new Domain` button
+* Enter the domain name you want to use and click on the `Submit` button
+
+
+### Frontend configuration
+* Complete steps in <a href="#domain-conf">domain configuration</a> before proceeding
+* Go to the `Files` tab
+* Click on `File Manager`
+* Click on the `public_html` folder
+* Create a new folder with the name of your project
+* Click on the `Upload` button
+* Upload the `build` folder of the frontend project
+* Add the following lines to the `.htaccess` file, if it doesn't exist create it
+```sh
+    <IfModule mod_rewrite.c>
+      Header set Access-Control-Allow-Origin '*'
+      RewriteEngine On
+      RewriteBase /
+      RewriteRule ^index\.html$ - [L]
+      RewriteCond %{REQUEST_FILENAME} !-f
+      RewriteCond %{REQUEST_FILENAME} !-d
+      RewriteCond %{REQUEST_FILENAME} !-l
+      RewriteRule . /index.html [L]
+    </IfModule>
+```
+
+
+### Backend configuration 
+
+If you chose to deploy the backend on **`cpanel`**, you need to follow these steps :
+* Complete steps in <a href="#domain-conf">domain configuration</a> before proceeding
+* Go to the `Files` tab
+* Click on `File Manager`
+* Click on the `public_html` folder
+* Create a new folder with the name of your project
+* Click on the `Upload` button
+* Zip your backend project except the `node_modules` folder
+* Upload the `.zip` folder of the backend project
+* Unzip the `.zip` folder
+* Create `.htaccess` file if it doesn't exist
+* Go to the `Software` tab
+* Click on `Setup Node.js App`
+* Click on the `Create Application` button
+* Fill in the form, choose the `Node.js` version you want, select the application mode (development or production), add your environment variables and click on the `Create` button
+* You will be redirected to the `Node.js Web Applications` page, click on the `Start` button to start the application, you can modify, restart, stop or delete the application from this page
+* To install the dependencies, click on `Modify` button, click on `Run NPM Install` button 
+
+
+Otherwise, if you chose to deploy the backend on **`heroku`**, you can follow these steps :
+* Create a new app on heroku
+* Go to the `Deploy` tab
+* Click on `Deployment method` and select `Github`
+* Connect your github account to heroku 
+* Search for your project and click on the `Connect` button
+* Go to the `Settings` tab
+* Click on `Reveal Config Vars`
+* Add the environment variables you need to use in your project
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -553,17 +683,19 @@ And not to mention the special thanks for the outstanding community stackoverflo
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [product-screenshot]: github/website.png
 [product-screenshot-2]: github/login.png
-[contributors-shield]: https://img.shields.io/github/contributors/kaoutar-ou/e-certificate-signature-algorand-backend.svg?style=for-the-badge
-[contributors-url]: https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend/graphs/contributors
-
+[contributors-shield]: https://img.shields.io/github/contributors/abderox/e-certificate-signature-algorand.svg?style=for-the-badge
+[contributors-url]: https://github.com/abderox/e-certificate-signature-algorand/graphs/contributors
 [stars-shield]: https://img.shields.io/github/stars/abderox/e-certificate-signature-algorand.svg?style=for-the-badge
-[stars-url]: https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend/stargazers
-[issues-shield]: https://img.shields.io/github/issues/kaoutar-ou/e-certificate-signature-algorand-backend.svg?style=for-the-badge
-[issues-url]: https://github.com/kaoutar-ou/e-certificate-signature-algorand-backend/issues
-
+[stars-url]: https://github.com/abderox/e-certificate-signature-algorand/stargazers
+[issues-shield]: https://img.shields.io/github/issues/abderox/e-certificate-signature-algorand.svg?style=for-the-badge
+[issues-url]: https://github.com/abderox/e-certificate-signature-algorand/issues
 [license-shield]: https://img.shields.io/github/license/abderox/e-certificate-signature-algorand.svg?style=for-the-badge
 [license-url]: https://github.com/abderox/e-certificate-signature-algorand/blob/main/LICENSE.txt
 [Algorand]: https://img.shields.io/badge/Algorand-20232A?style=for-the-badge&logo=algorand&logoColor=white
@@ -584,7 +716,7 @@ And not to mention the special thanks for the outstanding community stackoverflo
 [yarn]: https://img.shields.io/badge/yarn-20232A?style=for-the-badge&logo=yarn&logoColor=61DAFA
 
 [redux-url]: https://www.redux.js.org
-[redux]: https://img.shields.io/badge/redux-20232A?style=for-the-badge&logo=redux&logoColor=61DAFA
+[redux]: https://img.shields.io/badge/redux-20232A?style=for-the-badge&logo=reduX&logoColor=61DAFA
 
 
 
